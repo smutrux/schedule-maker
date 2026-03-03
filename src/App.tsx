@@ -15,6 +15,8 @@ import {
 	validatePreferences,
 	validateEvent,
 	downloadJSON,
+	downloadPDF,
+	downloadJPEG,
 	saveSchedule,
 	loadSchedule,
 	DEFAULT_COLOURS,
@@ -67,6 +69,7 @@ function App() {
 	const [itemOpen, setItemOpen] = useState(false);
 	const [downloadOpen, setDownloadOpen] = useState(false);
 	const [previewOpen, setPreviewOpen] = useState(false);
+	const [downloading, setDownloading] = useState<"pdf" | "jpeg" | null>(null);
 
 	const [prefsForm, setPrefsForm] = useState<PreferencesForm>(EMPTY_PREFS);
 	const [prefsErrors, setPrefsErrors] = useState<FormErrors<PreferencesForm>>(
@@ -76,13 +79,13 @@ function App() {
 	const [eventForm, setEventForm] = useState<EventForm>(EMPTY_EVENT);
 	const [eventErrors, setEventErrors] = useState<FormErrors<EventForm>>({});
 
-	// ── Load from localStorage on mount ────────────────────────────────────
+	// Load from localStorage on mount
 	useEffect(() => {
 		const stored = loadSchedule();
 		if (stored) setSchedule(stored);
 	}, []);
 
-	// ── Persist to localStorage on every change ─────────────────────────
+	// Persist to localStorage on every change
 	useEffect(() => {
 		if (schedule) saveSchedule(schedule);
 	}, [schedule]);
@@ -168,6 +171,35 @@ function App() {
 		setSchedule((prev) =>
 			prev ? { ...prev, events: prev.events.slice(0, -1) } : prev,
 		);
+	}
+
+	// ── Downloads ────────────────────────────────────────────────────────
+	async function handleDownloadPDF() {
+		if (!schedule || downloading) return;
+		setDownloading("pdf");
+		try {
+			await downloadPDF(schedule);
+		} finally {
+			setDownloading(null);
+			setDownloadOpen(false);
+		}
+	}
+
+	async function handleDownloadJPEG() {
+		if (!schedule || downloading) return;
+		setDownloading("jpeg");
+		try {
+			await downloadJPEG(schedule);
+		} finally {
+			setDownloading(null);
+			setDownloadOpen(false);
+		}
+	}
+
+	function handleDownloadJSON() {
+		if (!schedule) return;
+		downloadJSON(schedule);
+		setDownloadOpen(false);
 	}
 
 	return (
@@ -391,27 +423,36 @@ function App() {
 			<Modal
 				title="Choose Download Option"
 				isOpen={downloadOpen}
-				onClose={() => setDownloadOpen(false)}
+				onClose={() => !downloading && setDownloadOpen(false)}
 			>
 				<div className="modal-large-grid">
-					<Button large icon="picture_as_pdf" text="As PDF" disabled />
-					<Button large icon="image" text="As JPEG" disabled />
+					<Button
+						large
+						icon="picture_as_pdf"
+						text={downloading === "pdf" ? "Preparing…" : "As PDF"}
+						onClick={handleDownloadPDF}
+						disabled={!!downloading}
+					/>
+					<Button
+						large
+						icon="image"
+						text={downloading === "jpeg" ? "Preparing…" : "As JPEG"}
+						onClick={handleDownloadJPEG}
+						disabled={!!downloading}
+					/>
 					<Button
 						large
 						icon="file_json"
 						text="As JSON"
-						onClick={() => {
-							if (schedule) {
-								downloadJSON(schedule);
-								setDownloadOpen(false);
-							}
-						}}
+						onClick={handleDownloadJSON}
+						disabled={!!downloading}
 					/>
 					<Button
 						large
 						icon="arrow_back"
 						text="Back"
 						onClick={() => setDownloadOpen(false)}
+						disabled={!!downloading}
 					/>
 				</div>
 			</Modal>
