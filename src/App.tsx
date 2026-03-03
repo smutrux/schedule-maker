@@ -236,7 +236,7 @@ function App() {
 	return (
 		<div className="content-wrapper">
 			<h1>Pretty Schedule Maker</h1>
-			<p>Jump straight into creating your schedule below</p>
+			<p>Jump straight into creating your pretty schedule.</p>
 
 			<div className="btn-large-grid">
 				<Button
