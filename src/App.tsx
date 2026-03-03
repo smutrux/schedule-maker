@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "./components/Button";
 import {
 	TextInput,
@@ -15,12 +15,13 @@ import {
 	validatePreferences,
 	validateEvent,
 	downloadJSON,
+	saveSchedule,
+	loadSchedule,
 	DEFAULT_COLOURS,
 } from "./scheduleUtils";
 import type { Schedule, PreferencesForm, EventForm } from "./schedule.types";
 import type { FormErrors } from "./scheduleUtils";
-
-// ── Default form states ───────────────────────────────────────────────────────
+import { SchedulePreview } from "./SchedulePreview";
 
 const EMPTY_PREFS: PreferencesForm = {
 	name: "",
@@ -56,13 +57,12 @@ const DAYS = [
 	"sunday",
 ] as const;
 
-// ── App ───────────────────────────────────────────────────────────────────────
-
 function App() {
 	const [schedule, setSchedule] = useState<Schedule | null>(null);
 	const [prefsOpen, setPrefsOpen] = useState(false);
 	const [itemOpen, setItemOpen] = useState(false);
 	const [downloadOpen, setDownloadOpen] = useState(false);
+	const [previewOpen, setPreviewOpen] = useState(false);
 
 	const [prefsForm, setPrefsForm] = useState<PreferencesForm>(EMPTY_PREFS);
 	const [prefsErrors, setPrefsErrors] = useState<FormErrors<PreferencesForm>>(
@@ -72,6 +72,17 @@ function App() {
 	const [eventForm, setEventForm] = useState<EventForm>(EMPTY_EVENT);
 	const [eventErrors, setEventErrors] = useState<FormErrors<EventForm>>({});
 
+	// ── Load from localStorage on mount ────────────────────────────────────
+	useEffect(() => {
+		const stored = loadSchedule();
+		if (stored) setSchedule(stored);
+	}, []);
+
+	// ── Persist to localStorage on every change ─────────────────────────
+	useEffect(() => {
+		if (schedule) saveSchedule(schedule);
+	}, [schedule]);
+
 	const hasSchedule = schedule !== null;
 	const hasEvents = hasSchedule && schedule.events.length > 0;
 
@@ -80,8 +91,7 @@ function App() {
 		label: c.name,
 	}));
 
-	// ── Preferences ────────────────────────────────────────────────────────
-
+	// ── Preferences ─────────────────────────────────────────────────────
 	function openNewSchedule() {
 		setPrefsForm(EMPTY_PREFS);
 		setPrefsErrors({});
@@ -122,8 +132,7 @@ function App() {
 		setPrefsOpen(false);
 	}
 
-	// ── Events ──────────────────────────────────────────────────────────────
-
+	// ── Events ──────────────────────────────────────────────────────────
 	function openAddItem() {
 		setEventForm(EMPTY_EVENT);
 		setEventErrors({});
@@ -156,8 +165,6 @@ function App() {
 			prev ? { ...prev, events: prev.events.slice(0, -1) } : prev,
 		);
 	}
-
-	// ── Render ──────────────────────────────────────────────────────────────
 
 	return (
 		<div className="content-wrapper">
@@ -192,7 +199,13 @@ function App() {
 					onClick={handleRemoveLast}
 					disabled={!hasEvents}
 				/>
-				<Button large icon="dashboard" text="Preview Schedule" disabled />
+				<Button
+					large
+					icon="dashboard"
+					text="Preview Schedule"
+					onClick={() => setPreviewOpen(true)}
+					disabled={!hasSchedule}
+				/>
 				<Button large icon="print" text="Print Schedule" disabled />
 				<Button
 					large
@@ -213,7 +226,17 @@ function App() {
 				</div>
 			)}
 
-			{/* ── Preferences modal ───────────────────────────────────────── */}
+			{/* ── Preview modal ──────────────────────────────────────────── */}
+			<Modal
+				title={schedule?.name ?? "Preview"}
+				isOpen={previewOpen}
+				onClose={() => setPreviewOpen(false)}
+				width="90vw"
+			>
+				{schedule && <SchedulePreview schedule={schedule} />}
+			</Modal>
+
+			{/* ── Preferences modal ─────────────────────────────────────── */}
 			<Modal
 				title={
 					hasSchedule ? "Edit Schedule Preferences" : "Schedule Preferences"
@@ -270,7 +293,7 @@ function App() {
 				</div>
 			</Modal>
 
-			{/* ── Add item modal ───────────────────────────────────────────── */}
+			{/* ── Add item modal ─────────────────────────────────────────── */}
 			<Modal
 				title="Add Item to Schedule"
 				isOpen={itemOpen}
@@ -354,7 +377,7 @@ function App() {
 				</div>
 			</Modal>
 
-			{/* ── Download modal ───────────────────────────────────────────── */}
+			{/* ── Download modal ─────────────────────────────────────────── */}
 			<Modal
 				title="Choose Download Option"
 				isOpen={downloadOpen}

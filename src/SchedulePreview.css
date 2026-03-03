@@ -1,0 +1,108 @@
+/* ── Page wrapper ─────────────────────────────────────────────────────── */
+.sp-page {
+	background: white;
+	padding: 24px;
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: column;
+	font-family: "Poppins", sans-serif;
+	color: #000;
+	min-height: 400px;
+}
+
+/* ── Title ────────────────────────────────────────────────────────────── */
+.sp-title {
+	text-align: center;
+	margin: 0 0 16px 0;
+	font-size: 11px;
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: #333;
+}
+
+/* ── Grid ─────────────────────────────────────────────────────────────── */
+.sp-grid {
+	display: grid;
+	flex-grow: 1;
+	font-size: 11px;
+	position: relative;
+}
+
+/* ── Header cells ─────────────────────────────────────────────────────── */
+.sp-header-cell {
+	text-align: center;
+	font-weight: 700;
+	font-size: 11px;
+	padding: 4px;
+	border-right: 1px solid #bebebe;
+	background: #fff;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	border-bottom: 2px solid #333;
+}
+
+/* ── Time column ──────────────────────────────────────────────────────── */
+.sp-time-cell {
+	position: relative;
+	border-right: 1px solid #bebebe;
+	background: #fff;
+	min-height: 20px;
+}
+
+.sp-time-text {
+	position: absolute;
+	top: -7px;
+	right: 4px;
+	background: white;
+	padding: 0 3px;
+	color: #555;
+	font-size: 0.8em;
+	white-space: nowrap;
+	z-index: 1;
+}
+
+/* ── Background cells ─────────────────────────────────────────────────── */
+.sp-grid-cell {
+	width: 100%;
+	height: 100%;
+	border-right: 1px solid #bebebe;
+	box-sizing: border-box;
+	min-height: 20px;
+}
+
+.sp-col-alt-1 { background-color: #eeeeee; }
+.sp-col-alt-2 { background-color: #ffffff; }
+
+/* ── Row borders ──────────────────────────────────────────────────────── */
+.sp-border-black { border-top: 1px solid #000; }
+.sp-border-gray  { border-top: 1px solid #bebebe; }
+
+/* ── Event cards ──────────────────────────────────────────────────────── */
+.sp-event-card {
+	margin: 2px;
+	padding: 3px 4px;
+	border-radius: 3px;
+	font-size: 0.75rem;
+	overflow: hidden;
+	box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.25);
+	z-index: 10;
+	color: #000;
+	display: flex;
+	flex-direction: column;
+	gap: 1px;
+	position: relative;
+}
+
+.sp-event-name  { font-weight: 600; line-height: 1.2; }
+.sp-event-time  { font-size: 0.7rem; }
+.sp-event-info  { font-size: 0.7rem; color: #333; }
+.sp-event-online {
+	font-size: 0.65rem;
+	font-style: italic;
+	color: #555;
+}
