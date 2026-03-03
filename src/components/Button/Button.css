@@ -1,0 +1,153 @@
+/* ── Base button ──────────────────────────────────────────────────────── */
+.btn {
+	align-items: center;
+	background: var(--color-primary);
+	border: none;
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	color: var(--color-surface);
+	cursor: pointer;
+	display: inline-flex;
+	font-weight: 700;
+	font-size: 1.2rem;
+	gap: 0.5rem;
+	height: 3rem;
+	padding: 0 0.75rem;
+	transform: translateY(0);
+	transition:
+		transform 90ms ease-out,
+		box-shadow 90ms ease-out,
+		background-color var(--transition-fast);
+	font-family: "Poppins", system-ui, Helvetica, sans-serif;
+}
+
+.btn:hover {
+	background: var(--color-primary-hover);
+	background-image: linear-gradient(
+		to bottom,
+		rgba(255, 255, 255, 0.08),
+		rgba(255, 255, 255, 0)
+	);
+	filter: brightness(0.97);
+}
+
+.btn:active {
+	background: var(--color-primary-active);
+	box-shadow: var(--shadow-sm);
+	transform: translateY(1.5px) scale(0.98);
+}
+
+.btn-text {
+	margin: 0 0.5rem;
+}
+
+.btn-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Icon-only: square */
+.btn:has(.btn-icon):not(:has(.btn-text)) {
+	width: 3rem;
+	padding: 0;
+	justify-content: center;
+}
+
+/* ── Disabled (all variants) ──────────────────────────────────────────── */
+.btn-disabled,
+.btn-disabled:hover,
+.btn-disabled:active {
+	background: transparent;
+	box-shadow: none;
+	color: var(--color-text-disabled);
+	cursor: not-allowed;
+	filter: none;
+	transform: none;
+	border: 1.5px solid var(--color-border);
+}
+
+/* ── Large variant ────────────────────────────────────────────────────── */
+.btn-large {
+	background: var(--color-surface);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-md);
+	color: var(--color-text);
+	cursor: pointer;
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	width: 100%;
+	padding: 0;
+	height: auto;
+	gap: 0;
+	font-size: 1rem;
+	font-weight: 700;
+	transition:
+		box-shadow 90ms ease-out,
+		border-color var(--transition-fast),
+		background-color var(--transition-fast);
+}
+
+.btn-large:hover {
+	background: var(--color-surface-muted);
+	border-color: var(--color-border-hover);
+	background-image: none;
+	filter: none;
+}
+
+.btn-large:active {
+	background: var(--color-border);
+	box-shadow: var(--shadow-sm);
+	transform: translateY(1px) scale(0.98);
+}
+
+.btn-large-icon {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	aspect-ratio: 1;
+	padding: 1rem;
+	box-sizing: border-box;
+}
+
+.btn-large-icon .material-symbols-outlined {
+	font-size: clamp(1.5rem, 8vw, 3rem);
+	width: 100%;
+	height: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.btn-large-text {
+	/* width: 100%; */
+	padding: 0.5rem 0.75rem 0.75rem;
+	box-sizing: border-box;
+	text-align: center;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	font-size: 1rem;
+	color: var(--color-text);
+	/* border-top: 1.5px solid var(--color-border); */
+}
+
+/* Disabled large */
+.btn-large.btn-disabled,
+.btn-large.btn-disabled:hover,
+.btn-large.btn-disabled:active {
+	border-color: var(--color-border);
+	background: var(--color-surface);
+	color: var(--color-text-disabled);
+	cursor: not-allowed;
+	transform: none;
+	box-shadow: var(--shadow-md);
+}
+
+.btn-large.btn-disabled .btn-large-text,
+.btn-large.btn-disabled .btn-large-icon {
+	color: var(--color-text-disabled);
+}
