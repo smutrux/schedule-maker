@@ -186,6 +186,75 @@ export function validateEvent(form: EventForm): FormErrors<EventForm> {
 	return e;
 }
 
+// ── Import / validation ──────────────────────────────────────────────────────
+
+export type ImportResult =
+	| { ok: true; schedule: Schedule }
+	| { ok: false; error: string };
+
+export function validateImport(raw: unknown): ImportResult {
+	if (!raw || typeof raw !== "object" || Array.isArray(raw)) {
+		return { ok: false, error: "File is not a valid JSON object." };
+	}
+
+	const obj = raw as Record<string, unknown>;
+
+	if (typeof obj.name !== "string" || !obj.name.trim()) {
+		return { ok: false, error: 'Missing or empty required field: "name".' };
+	}
+	if (typeof obj.scheduleStart !== "string" || !obj.scheduleStart) {
+		return { ok: false, error: 'Missing required field: "scheduleStart".' };
+	}
+	if (typeof obj.scheduleEnd !== "string" || !obj.scheduleEnd) {
+		return { ok: false, error: 'Missing required field: "scheduleEnd".' };
+	}
+	if (typeof obj["24hr"] !== "boolean") {
+		return {
+			ok: false,
+			error:
+				'Missing or invalid required field: "24hr" (must be true or false).',
+		};
+	}
+	if (!Array.isArray(obj.colours) || obj.colours.length === 0) {
+		return { ok: false, error: '"colours" must be a non-empty array.' };
+	}
+
+	// Ensure every colour entry has name + colour string
+	for (let i = 0; i < obj.colours.length; i++) {
+		const c = obj.colours[i];
+		if (
+			!c ||
+			typeof c !== "object" ||
+			typeof c.name !== "string" ||
+			typeof c.colour !== "string"
+		) {
+			return {
+				ok: false,
+				error: `colours[${i}] is invalid — each entry needs "name" and "colour" strings.`,
+			};
+		}
+	}
+
+	// events is optional but must be an array if present
+	const events = Array.isArray(obj.events) ? obj.events : [];
+
+	return {
+		ok: true,
+		schedule: {
+			createTime:
+				typeof obj.createTime === "string"
+					? obj.createTime
+					: new Date().toISOString(),
+			name: obj.name.trim(),
+			scheduleStart: obj.scheduleStart,
+			scheduleEnd: obj.scheduleEnd,
+			"24hr": obj["24hr"],
+			colours: obj.colours as Schedule["colours"],
+			events: events as Schedule["events"],
+		},
+	};
+}
+
 // ── localStorage ──────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = "pretty_schedule";

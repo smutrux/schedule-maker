@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "./components/Button";
 import {
 	TextInput,
@@ -19,6 +19,7 @@ import {
 	downloadJPEG,
 	saveSchedule,
 	loadSchedule,
+	validateImport,
 	DEFAULT_COLOURS,
 } from "./scheduleUtils";
 import type { Schedule, PreferencesForm, EventForm } from "./schedule.types";
@@ -70,6 +71,8 @@ function App() {
 	const [downloadOpen, setDownloadOpen] = useState(false);
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [downloading, setDownloading] = useState<"pdf" | "jpeg" | null>(null);
+	const [importError, setImportError] = useState<string | null>(null);
+	const fileInputRef = useRef<HTMLInputElement>(null);
 
 	const [prefsForm, setPrefsForm] = useState<PreferencesForm>(EMPTY_PREFS);
 	const [prefsErrors, setPrefsErrors] = useState<FormErrors<PreferencesForm>>(
@@ -202,6 +205,34 @@ function App() {
 		setDownloadOpen(false);
 	}
 
+	function handleImportClick() {
+		fileInputRef.current?.click();
+	}
+
+	function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+		const file = e.target.files?.[0];
+		if (!file) return;
+		// Reset so the same file can be re-selected after an error
+		e.target.value = "";
+
+		const reader = new FileReader();
+		reader.onload = (ev) => {
+			try {
+				const parsed = JSON.parse(ev.target?.result as string);
+				const result = validateImport(parsed);
+				if (result.ok) {
+					setSchedule(result.schedule);
+					setImportError(null);
+				} else {
+					setImportError(result.error);
+				}
+			} catch {
+				setImportError("Could not parse file — make sure it is valid JSON.");
+			}
+		};
+		reader.readAsText(file);
+	}
+
 	return (
 		<div className="content-wrapper">
 			<h1>Pretty Schedule Maker</h1>
@@ -256,7 +287,7 @@ function App() {
 					onClick={() => setDownloadOpen(true)}
 					disabled={!hasSchedule}
 				/>
-				<Button large icon="upload" text="Import" />
+				<Button large icon="upload" text="Import" onClick={handleImportClick} />
 			</div>
 
 			{hasSchedule && (
@@ -454,6 +485,35 @@ function App() {
 						onClick={() => setDownloadOpen(false)}
 						disabled={!!downloading}
 					/>
+				</div>
+			</Modal>
+
+			{/* Hidden file input for JSON import */}
+			<input
+				ref={fileInputRef}
+				type="file"
+				accept=".json,application/json"
+				style={{ display: "none" }}
+				onChange={handleFileChange}
+			/>
+
+			{/* Import error modal */}
+			<Modal
+				title="Invalid Schedule File"
+				isOpen={importError !== null}
+				onClose={() => setImportError(null)}
+			>
+				<div
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						gap: "1.25rem",
+						padding: "0.5rem 0",
+					}}
+				>
+					<p style={{ margin: 0, textAlign: "center" }}>{importError}</p>
+					<Button text="OK" icon="check" onClick={() => setImportError(null)} />
 				</div>
 			</Modal>
 
