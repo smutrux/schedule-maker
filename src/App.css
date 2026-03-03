@@ -5,7 +5,8 @@
 	text-align: center;
 }
 
-h1, p {
+h1,
+p {
 	margin: 0 auto;
 }
 
@@ -40,12 +41,21 @@ h1, p {
 }
 
 .btn-large-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  width: 100%;
-  max-width: 600px;
-  margin: 0 auto;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.75rem;
+	width: 100%;
+	max-width: 600px;
+	margin: 0 auto;
+}
+
+.modal-large-grid {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 0.75rem;
+	width: 100%;
+	max-width: 300px;
+	margin: 0 auto;
 }
 
 .modal-contents {
@@ -56,9 +66,31 @@ h1, p {
 	justify-content: center;
 }
 
+/* ── Schedule summary ─────────────────────────────────────────────────── */
+.schedule-summary {
+	margin-top: 1.5rem;
+	padding: 1rem 1.25rem;
+	background: var(--color-surface);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-sm);
+	color: var(--color-text-muted);
+	font-size: 0.95rem;
+	max-width: 800px;
+	margin-inline: auto;
+}
+
+/* ── Form validation errors ───────────────────────────────────────────── */
+.form-error {
+	color: var(--color-error);
+	font-size: 0.8rem;
+	margin: -0.25rem 0 0 0.25rem;
+	width: 100%;
+}
+
 @media screen and (min-width: 768px) {
-  .btn-large-grid {
-    grid-template-columns: repeat(4, 1fr);
-    max-width: 800px;
-  }
+	.btn-large-grid {
+		grid-template-columns: repeat(4, 1fr);
+		max-width: 800px;
+	}
 }
