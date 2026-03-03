@@ -1,37 +1,39 @@
 import type { InputHTMLAttributes } from "react";
 
 export type TextInputProps = {
-  placeholder?: string;
-  label?: string;
+	placeholder?: string;
+	label?: string;
 } & InputHTMLAttributes<HTMLInputElement>;
 
 export type CheckboxProps = {
-  checked?: boolean;
-  onChange?: (checked: boolean) => void;
-  label?: string;
+	checked?: boolean;
+	onChange?: (checked: boolean) => void;
+	label?: string;
+	disabled?: boolean;
 };
 
 export type ColourPickerProps = {
-  value?: string;
-  onChange?: (value: string) => void;
-  label?: string;
+	value?: string;
+	onChange?: (value: string) => void;
+	label?: string;
 };
 
 export type DropdownOption = {
-  value: string;
-  label: string;
+	value: string;
+	label: string;
 };
 
 export type DropdownProps = {
-  options: DropdownOption[];
-  value?: string;
-  onChange?: (value: string) => void;
-  placeholder?: string;
-  label?: string;
+	options: DropdownOption[];
+	value?: string;
+	onChange?: (value: string) => void;
+	placeholder?: string;
+	label?: string;
 };
 
 export type TimePickerProps = {
-  value?: string;
-  onChange?: (value: string) => void;
-  label?: string;
+	value?: string;
+	onChange?: (value: string) => void;
+	label?: string;
+	is24hr?: boolean;
 };

@@ -68,6 +68,7 @@ export function Checkbox({
 	checked: controlledChecked,
 	onChange,
 	label,
+	disabled = false,
 }: CheckboxProps) {
 	const id = useId();
 	const isControlled = controlledChecked !== undefined;
@@ -80,7 +81,10 @@ export function Checkbox({
 	}
 
 	return (
-		<label className="input-checkbox-label" onClick={handleClick}>
+		<label
+			className={`input-checkbox-label${disabled ? " input-checkbox-disabled" : ""}`}
+			onClick={disabled ? undefined : handleClick}
+		>
 			<span className={`input-checkbox ${checked ? "checked" : ""}`}>
 				{checked && (
 					<svg
@@ -240,6 +244,7 @@ export function TimePicker({
 	value: controlledValue,
 	onChange,
 	label,
+	is24hr = false,
 }: TimePickerProps) {
 	const id = useId();
 	const isControlled = controlledValue !== undefined;
@@ -247,21 +252,33 @@ export function TimePicker({
 	const value = isControlled ? controlledValue! : internalValue;
 	const inputRef = useRef<HTMLInputElement>(null);
 
-	function formatDisplay(v: string) {
+	// Normalise whatever the browser gives us to "HH:MM" 24hr string
+	function normalise(raw: string): string {
+		if (!raw) return "";
+		// Already "HH:MM" from a standard time input — just return it
+		if (/^\d{1,2}:\d{2}$/.test(raw)) return raw.padStart(5, "0");
+		return raw;
+	}
+
+	function formatDisplay(v: string): string | null {
 		if (!v) return null;
 		const [h, m] = v.split(":");
-		const hour = parseInt(h);
+		const hour = parseInt(h, 10);
+		if (isNaN(hour)) return null;
+		if (is24hr) return `${String(hour).padStart(2, "0")}:${m}`;
 		const suffix = hour >= 12 ? "p.m." : "a.m.";
 		const display = hour % 12 === 0 ? 12 : hour % 12;
 		return `${String(display).padStart(2, "0")}:${m} ${suffix}`;
 	}
 
 	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		if (!isControlled) setInternalValue(e.target.value);
-		onChange?.(e.target.value);
+		const normalised = normalise(e.target.value);
+		if (!isControlled) setInternalValue(normalised);
+		onChange?.(normalised);
 	}
 
 	const display = formatDisplay(value);
+	const placeholder = is24hr ? "08:00" : "08:00 a.m.";
 
 	return (
 		<Field label={label} id={id}>
@@ -270,7 +287,7 @@ export function TimePicker({
 				onClick={() => inputRef.current?.showPicker?.()}
 			>
 				<span className="input-time-display">
-					{display ?? <span className="input-placeholder">08:00 a.m.</span>}
+					{display ?? <span className="input-placeholder">{placeholder}</span>}
 				</span>
 				<input
 					ref={inputRef}

@@ -20,6 +20,7 @@ import {
 	saveSchedule,
 	loadSchedule,
 	validateImport,
+	clearSchedule,
 	DEFAULT_COLOURS,
 } from "./scheduleUtils";
 import type { Schedule, PreferencesForm, EventForm } from "./schedule.types";
@@ -71,6 +72,7 @@ function App() {
 	const [downloadOpen, setDownloadOpen] = useState(false);
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [downloading, setDownloading] = useState<"pdf" | "jpeg" | null>(null);
+	const [isEditingExisting, setIsEditingExisting] = useState(false);
 	const [importError, setImportError] = useState<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -105,11 +107,13 @@ function App() {
 	function openNewSchedule() {
 		setPrefsForm(EMPTY_PREFS);
 		setPrefsErrors({});
+		setIsEditingExisting(false);
 		setPrefsOpen(true);
 	}
 
 	function openEditPreferences() {
 		if (!schedule) return;
+		setIsEditingExisting(true);
 		setPrefsForm({
 			name: schedule.name,
 			scheduleStart: schedule.scheduleStart,
@@ -126,7 +130,9 @@ function App() {
 		v: PreferencesForm[K],
 	) {
 		setPrefsForm((p) => ({ ...p, [k]: v }));
-		setPrefsErrors((p) => ({ ...p, [k]: undefined }));
+		// Clear all errors on any change — stale errors from a previous save
+		// attempt should not persist when the user is still editing the form.
+		setPrefsErrors({});
 	}
 
 	function handleSavePrefs() {
@@ -135,8 +141,18 @@ function App() {
 			setPrefsErrors(errors);
 			return;
 		}
-		const existing = schedule?.colours ?? DEFAULT_COLOURS;
-		const built = buildSchedule(prefsForm, existing, schedule?.events ?? []);
+		if (!isEditingExisting) {
+			// Starting fresh — wipe any previously saved schedule
+			clearSchedule();
+		}
+		const existing = isEditingExisting
+			? (schedule?.colours ?? DEFAULT_COLOURS)
+			: DEFAULT_COLOURS;
+		const built = buildSchedule(
+			prefsForm,
+			existing,
+			isEditingExisting ? (schedule?.events ?? []) : [],
+		);
 		setSchedule(built);
 		setPrefsErrors({});
 		setPrefsOpen(false);
@@ -333,12 +349,14 @@ function App() {
 						label="24 hr Time"
 						checked={prefsForm.is24hr}
 						onChange={(v) => setPrefsField("is24hr", v)}
+						disabled={isEditingExisting}
 					/>
 
 					<TimePicker
 						label="Earliest Start Time"
 						value={prefsForm.scheduleStart}
 						onChange={(v) => setPrefsField("scheduleStart", v)}
+						is24hr={prefsForm.is24hr}
 					/>
 					{prefsErrors.scheduleStart && (
 						<p className="form-error">{prefsErrors.scheduleStart}</p>
@@ -348,6 +366,7 @@ function App() {
 						label="Latest End Time"
 						value={prefsForm.scheduleEnd}
 						onChange={(v) => setPrefsField("scheduleEnd", v)}
+						is24hr={prefsForm.is24hr}
 					/>
 					{prefsErrors.scheduleEnd && (
 						<p className="form-error">{prefsErrors.scheduleEnd}</p>
@@ -397,6 +416,7 @@ function App() {
 						label="Start Time"
 						value={eventForm.start}
 						onChange={(v) => setEventField("start", v)}
+						is24hr={schedule?.["24hr"] ?? false}
 					/>
 					{eventErrors.start && (
 						<p className="form-error">{eventErrors.start}</p>
@@ -406,6 +426,7 @@ function App() {
 						label="End Time"
 						value={eventForm.end}
 						onChange={(v) => setEventField("end", v)}
+						is24hr={schedule?.["24hr"] ?? false}
 					/>
 					{eventErrors.end && <p className="form-error">{eventErrors.end}</p>}
 

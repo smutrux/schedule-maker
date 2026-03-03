@@ -65,6 +65,9 @@
 	gap: 0.6rem;
 	cursor: pointer;
 	user-select: none;
+	/* Push checkbox down so its bottom aligns with labelled inputs.
+	   Accounts for label font size (0.8rem) + line-height (1.2) + gap (0.375rem) */
+	margin-top: calc(0.8rem * 1.2 + 0.375rem);
 }
 
 .input-checkbox {
@@ -192,4 +195,11 @@
 	width: 0;
 	height: 0;
 	pointer-events: none;
+}
+
+/* ── Checkbox disabled ───────────────────────────────────────────────── */
+.input-checkbox-disabled,
+.input-checkbox-disabled .input-checkbox {
+	opacity: 0.4;
+	cursor: not-allowed;
 }
