@@ -1,13 +1,63 @@
+/* ── Print setup ──────────────────────────────────────────────────────── */
+@page {
+	size: letter portrait;
+	margin: 0; /* We control margins via .sp-page padding */
+}
+
+@media print {
+	/* Hide everything on the page except the hidden print root */
+	body > * {
+		display: none !important;
+	}
+	.sp-print-root {
+		display: block !important;
+	}
+
+	.sp-page {
+		width: 8.5in !important;
+		height: 11in !important;
+		padding: 1in !important;
+		box-shadow: none !important;
+		position: fixed !important;
+		top: 0 !important;
+		left: 0 !important;
+	}
+
+	/* Ensure background colours actually print */
+	.sp-col-alt-1,
+	.sp-event-card {
+		-webkit-print-color-adjust: exact;
+		print-color-adjust: exact;
+	}
+
+	.sp-header-cell {
+		position: static !important;
+	}
+}
+
+/* Hidden container that only surfaces during print */
+.sp-print-root {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 9999;
+}
+
 /* ── Page wrapper ─────────────────────────────────────────────────────── */
 .sp-page {
+	/* Match physical letter size + 1in margins so screen preview = printed output */
+	width: 8.5in;
+	height: 11in;
+	padding: 1in;
 	background: white;
-	padding: 24px;
 	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
 	font-family: "Poppins", sans-serif;
 	color: #000;
-	min-height: 400px;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
+	flex-shrink: 0;
 }
 
 /* ── Title ────────────────────────────────────────────────────────────── */
@@ -27,6 +77,8 @@
 	flex-grow: 1;
 	font-size: 11px;
 	position: relative;
+	/* Prevent grid from overflowing the page */
+	overflow: hidden;
 }
 
 /* ── Header cells ─────────────────────────────────────────────────────── */
@@ -51,7 +103,6 @@
 	position: relative;
 	border-right: 1px solid #bebebe;
 	background: #fff;
-	min-height: 20px;
 }
 
 .sp-time-text {
@@ -72,15 +123,22 @@
 	height: 100%;
 	border-right: 1px solid #bebebe;
 	box-sizing: border-box;
-	min-height: 20px;
 }
 
-.sp-col-alt-1 { background-color: #eeeeee; }
-.sp-col-alt-2 { background-color: #ffffff; }
+.sp-col-alt-1 {
+	background-color: #eeeeee;
+}
+.sp-col-alt-2 {
+	background-color: #ffffff;
+}
 
 /* ── Row borders ──────────────────────────────────────────────────────── */
-.sp-border-black { border-top: 1px solid #000; }
-.sp-border-gray  { border-top: 1px solid #bebebe; }
+.sp-border-black {
+	border-top: 1px solid #000;
+}
+.sp-border-gray {
+	border-top: 1px solid #bebebe;
+}
 
 /* ── Event cards ──────────────────────────────────────────────────────── */
 .sp-event-card {
@@ -98,9 +156,17 @@
 	position: relative;
 }
 
-.sp-event-name  { font-weight: 600; line-height: 1.2; }
-.sp-event-time  { font-size: 0.7rem; }
-.sp-event-info  { font-size: 0.7rem; color: #333; }
+.sp-event-name {
+	font-weight: 600;
+	line-height: 1.2;
+}
+.sp-event-time {
+	font-size: 0.7rem;
+}
+.sp-event-info {
+	font-size: 0.7rem;
+	color: #333;
+}
 .sp-event-online {
 	font-size: 0.65rem;
 	font-style: italic;

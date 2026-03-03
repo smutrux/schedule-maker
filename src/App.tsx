@@ -21,7 +21,11 @@ import {
 } from "./scheduleUtils";
 import type { Schedule, PreferencesForm, EventForm } from "./schedule.types";
 import type { FormErrors } from "./scheduleUtils";
-import { SchedulePreview } from "./SchedulePreview";
+import {
+	SchedulePreview,
+	SchedulePrintRoot,
+	printSchedule,
+} from "./SchedulePreview";
 
 const EMPTY_PREFS: PreferencesForm = {
 	name: "",
@@ -206,7 +210,13 @@ function App() {
 					onClick={() => setPreviewOpen(true)}
 					disabled={!hasSchedule}
 				/>
-				<Button large icon="print" text="Print Schedule" disabled />
+				<Button
+					large
+					icon="print"
+					text="Print Schedule"
+					onClick={printSchedule}
+					disabled={!hasSchedule}
+				/>
 				<Button
 					large
 					icon="download"
@@ -405,6 +415,9 @@ function App() {
 					/>
 				</div>
 			</Modal>
+
+			{/* Hidden print target mounted to body */}
+			{hasSchedule && <SchedulePrintRoot schedule={schedule} />}
 		</div>
 	);
 }
