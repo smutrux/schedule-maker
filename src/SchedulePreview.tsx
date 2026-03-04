@@ -122,6 +122,9 @@ function ScheduleGrid({ schedule }: Props) {
 									backgroundColor: event.colour,
 									gridColumn: colIndex + 2,
 									gridRow: `${startRow} / span ${spanRows}`,
+									// if event is online, add dashed border
+									borderStyle: event.online ? "dashed" : "none",
+									// background-image: event.online ? "none" : "url("data:image/svg+xml,%3csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3e%3crect width='100%25' height='100%25' fill='none' rx='3' ry='3' stroke='black' stroke-width='8' stroke-dasharray='16' stroke-dashoffset='0' stroke-linecap='round'/%3e%3c/svg%3e")",
 								}}
 							>
 								<span className="sp-event-name">{event.name}</span>
