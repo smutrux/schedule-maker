@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# Pretty Schedule Maker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A weekly schedule builder that lets you create named schedules, add timed events, preview the result as a letter-sized page, and export it as PDF, JPEG, or JSON.
 
-Currently, two official plugins are available:
+![Pretty Schedule Maker favicon](public/favicon.svg)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Features
 
-## React Compiler
+- **Weekly grid** — Mon–Fri by default, with Saturday and Sunday added automatically when events are scheduled on those days
+- **Flexible time range** — set any earliest start and latest end time; the grid fills the full page height regardless of the range
+- **12hr / 24hr toggle** — switch display format when creating a schedule
+- **Off-grid event placement** — events that start at non-30-minute boundaries (e.g. 9:10, 14:45) are positioned with sub-row precision
+- **Custom colours** — pick any colour via an integrated colour picker with hex input; colour names are looked up automatically via [The Color Name API](https://www.thecolorapi.com) with a local fallback
+- **Online / in-person indicator** — online events get a dashed border, in-person events get a solid one
+- **Export options** — download as PDF (letter size), high-resolution JPEG (3× pixel density), or JSON
+- **Import** — load a previously exported JSON schedule back into the app
+- **Print** — print directly from the browser with a dedicated print stylesheet
+- **Persistent storage** — schedules are saved to localStorage and restored on next visit
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## Tech Stack
 
-## Expanding the ESLint configuration
+- [React](https://react.dev) + [TypeScript](https://www.typescriptlang.org)
+- [Vite](https://vitejs.dev)
+- [react-colorful](https://github.com/omgovich/react-colorful) — colour picker
+- [html2canvas](https://html2canvas.hertzen.com) — PDF and JPEG capture
+- [jsPDF](https://github.com/parallax/jsPDF) — PDF generation
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### Prerequisites
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- Node.js 18 or later
+- npm
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Install and run
+
+```bash
+git clone https://github.com/smutrux/schedule-maker.git
+cd schedule-maker
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The app will be available at `http://localhost:5173`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Build for production
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run build
+```
+
+Output goes to `dist/`.
+
+### Deploy to GitHub Pages
+
+```bash
+npm run deploy
+```
+
+This runs the build and pushes the output to the `gh-pages` branch. The live site is at:
+
+```
+https://smutrux.github.io/schedule-maker/
+```
+
+## Usage
+
+1. Click **Start New** to create a schedule — give it a name, set the time range, and choose 12hr or 24hr format
+2. Click **Add Item** to add an event — set the title, time, colour, days of the week, and whether it's online
+3. Click **Preview Schedule** to see the letter-sized page
+4. Use **Download** to export as PDF, JPEG, or JSON
+5. Use **Import** to load a saved JSON schedule
+6. Click **Edit Preferences** to rename the schedule or add a custom colour
+7. **Remove Last Item** removes the most recently added event
+
+## Project Structure
+
+```
+src/
+├── App.tsx                  # Main component, all state
+├── SchedulePreview.tsx      # Grid renderer, print root, preview
+├── SchedulePreview.css      # Grid styles and print media query
+├── scheduleUtils.ts         # Pure helpers: build, validate, export, storage
+├── schedule.types.ts        # TypeScript types
+└── components/
+    ├── Button/
+    ├── Input/               # TextInput, Checkbox, ColourPicker, TimePicker, Dropdown
+    └── Modal/
 ```
