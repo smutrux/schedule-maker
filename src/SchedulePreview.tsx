@@ -68,7 +68,10 @@ function ScheduleGrid({ schedule }: Props) {
 				{/* Headers */}
 				<div className="sp-header-cell">Time</div>
 				{activeDays.map((day, dayIdx) => (
-					<div key={day} className={`sp-header-cell${dayIdx === activeDays.length - 1 ? " sp-no-right-border" : ""}`}>
+					<div
+						key={day}
+						className={`sp-header-cell${dayIdx === activeDays.length - 1 ? " sp-no-right-border" : ""}`}
+					>
 						{day.charAt(0).toUpperCase() + day.slice(1)}
 					</div>
 				))}
@@ -124,7 +127,8 @@ function ScheduleGrid({ schedule }: Props) {
 
 					// top% and height% are relative to the wrapper's height (= gridRowSpan rows)
 					const topPct = (topFraction / gridRowSpan) * 100;
-					const heightPct = ((endSlotExact - startSlotExact) / gridRowSpan) * 100;
+					const heightPct =
+						((endSlotExact - startSlotExact) / gridRowSpan) * 100;
 
 					const timeLabel = `${formatTime(event.start, schedule["24hr"])} - ${formatTime(event.end, schedule["24hr"])}`;
 
@@ -132,7 +136,7 @@ function ScheduleGrid({ schedule }: Props) {
 						const colIndex = activeDays.indexOf(day.toLowerCase());
 						if (colIndex === -1) return [];
 						const borderColor = colIndex % 2 === 0 ? "#eeeeee" : "#ffffff";
-						const strokeW = 12;
+						const strokeW = 6;
 						return (
 							// Transparent wrapper occupies the exact grid rows
 							<div
@@ -153,29 +157,78 @@ function ScheduleGrid({ schedule }: Props) {
 										border: `1px solid ${borderColor}`,
 									}}
 								>
-								{/* SVG border overlay — solid for in-person, round-capped dashes for online */}
-								<svg className="sp-event-border" aria-hidden="true">
-									<rect
-										x={0}
-										y={0}
-										width="100%"
-										height="100%"
-										fill="none"
-										stroke={borderColor}
-										strokeWidth={strokeW}
-										strokeLinecap={event.online ? "round" : "butt"}
-										strokeDasharray={event.online ? "16 24" : "none"}
-										rx={12}
-									/>
-								</svg>
-								<span className="sp-event-name">{event.name}</span>
-								<strong className="sp-event-time">{timeLabel}</strong>
-								{event.additionalInfo && (
-									<span className="sp-event-info">{event.additionalInfo}</span>
-								)}
-								{event.online && (
-									<span className="sp-event-online">Online</span>
-								)}
+									{/* SVG border overlay — solid for in-person, dashes for online */}
+									{event.online ? (
+										<svg className="sp-event-border" aria-hidden="true">
+											{/* top */}
+											<line
+												x1="0"
+												y1="0"
+												x2="100%"
+												y2="0"
+												stroke={borderColor}
+												strokeWidth={2 * strokeW}
+												strokeLinecap="round"
+												strokeDasharray="11 21"
+											/>
+											{/* bottom */}
+											<line
+												x1="0"
+												y1="100%"
+												x2="100%"
+												y2="100%"
+												stroke={borderColor}
+												strokeWidth={2 * strokeW}
+												strokeLinecap="round"
+												strokeDasharray="11 21"
+											/>
+											{/* left */}
+											<line
+												x1="0"
+												y1="0"
+												x2="0"
+												y2="100%"
+												stroke={borderColor}
+												strokeWidth={2 * strokeW}
+												strokeLinecap="round"
+												strokeDasharray="11 21"
+											/>
+											{/* right */}
+											<line
+												x1="100%"
+												y1="0"
+												x2="100%"
+												y2="100%"
+												stroke={borderColor}
+												strokeWidth={2 * strokeW}
+												strokeLinecap="round"
+												strokeDasharray="11 21"
+											/>
+										</svg>
+									) : (
+										<svg className="sp-event-border" aria-hidden="true">
+											<rect
+												x={strokeW / 2}
+												y={strokeW / 2}
+												width={`calc(100% - ${strokeW}px)`}
+												height={`calc(100% - ${strokeW}px)`}
+												fill="none"
+												stroke={borderColor}
+												strokeWidth={strokeW}
+												rx={12 - strokeW / 2}
+											/>
+										</svg>
+									)}
+									<span className="sp-event-name">{event.name}</span>
+									<strong className="sp-event-time">{timeLabel}</strong>
+									{event.additionalInfo && (
+										<span className="sp-event-info">
+											{event.additionalInfo}
+										</span>
+									)}
+									{event.online && (
+										<span className="sp-event-online">Online</span>
+									)}
 								</div>
 							</div>
 						);
