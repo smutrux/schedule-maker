@@ -1,4 +1,7 @@
 import { useRef, useEffect, useState, useId } from "react";
+import { createPortal } from "react-dom";
+import { HexColorPicker, HexColorInput } from "react-colorful";
+
 import type {
 	TextInputProps,
 	CheckboxProps,
@@ -108,75 +111,94 @@ export function Checkbox({
 }
 
 // ── Colour Picker ─────────────────────────────────────────────────────────────
-function NoiseCanvas({ color }: { color: string }) {
-	const canvasRef = useRef<HTMLCanvasElement>(null);
-
-	useEffect(() => {
-		const canvas = canvasRef.current;
-		if (!canvas) return;
-		const ctx = canvas.getContext("2d");
-		if (!ctx) return;
-
-		const r = parseInt(color.slice(1, 3), 16);
-		const g = parseInt(color.slice(3, 5), 16);
-		const b = parseInt(color.slice(5, 7), 16);
-
-		const imageData = ctx.createImageData(canvas.width, canvas.height);
-		const data = imageData.data;
-
-		for (let i = 0; i < data.length; i += 4) {
-			const n = (Math.random() - 0.5) * 40;
-			data[i] = Math.min(255, Math.max(0, r + n));
-			data[i + 1] = Math.min(255, Math.max(0, g + n));
-			data[i + 2] = Math.min(255, Math.max(0, b + n));
-			data[i + 3] = 255;
-		}
-
-		ctx.putImageData(imageData, 0, 0);
-	}, [color]);
-
-	return (
-		<canvas
-			ref={canvasRef}
-			className="colour-picker-canvas"
-			width={600}
-			height={120}
-		/>
-	);
-}
-
 export function ColourPicker({
 	value: controlledValue,
 	onChange,
 	label,
 }: ColourPickerProps) {
 	const id = useId();
+	const [open, setOpen] = useState(false);
 	const isControlled = controlledValue !== undefined;
 	const [internalValue, setInternalValue] = useState("#6b93c4");
 	const value = isControlled ? controlledValue! : internalValue;
-	const inputRef = useRef<HTMLInputElement>(null);
+	const swatchRef = useRef<HTMLDivElement>(null);
+	const popoverRef = useRef<HTMLDivElement>(null);
+	const [popoverPos, setPopoverPos] = useState<{
+		top: number;
+		left: number;
+	} | null>(null);
+	const [portalTarget, setPortalTarget] = useState<Element>(document.body);
 
-	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		if (!isControlled) setInternalValue(e.target.value);
-		onChange?.(e.target.value);
+	function handleChange(hex: string) {
+		if (!isControlled) setInternalValue(hex);
+		onChange?.(hex);
 	}
+
+	function handleOpen() {
+		if (open) {
+			setOpen(false);
+			return;
+		}
+		const rect = swatchRef.current?.getBoundingClientRect();
+		if (rect) {
+			setPopoverPos({
+				top: rect.bottom + 8,
+				left: rect.left,
+			});
+		}
+		// Portal into the dialog if inside one, otherwise body
+		const dialog = swatchRef.current?.closest("dialog");
+		setPortalTarget(dialog ?? document.body);
+		setOpen(true);
+	}
+
+	// Close on click outside both the trigger and the popover
+	useEffect(() => {
+		if (!open) return;
+		function handleClick(e: MouseEvent) {
+			if (
+				swatchRef.current?.contains(e.target as Node) ||
+				popoverRef.current?.contains(e.target as Node)
+			)
+				return;
+			setOpen(false);
+		}
+		document.addEventListener("mousedown", handleClick);
+		return () => document.removeEventListener("mousedown", handleClick);
+	}, [open]);
 
 	return (
 		<Field label={label} id={id}>
+			{/* Swatch trigger */}
 			<div
+				ref={swatchRef}
 				className="input-wrapper input-colour-wrapper"
-				onClick={() => inputRef.current?.click()}
+				onClick={handleOpen}
 			>
-				<NoiseCanvas color={value} />
-				<input
-					ref={inputRef}
-					id={id}
-					type="color"
-					value={value}
-					onChange={handleChange}
-					className="colour-picker-native"
+				<div
+					className="colour-picker-swatch"
+					style={{ backgroundColor: value }}
 				/>
+				<span className="colour-picker-hex-display">{value}</span>
 			</div>
+
+			{/* Floating picker portal — renders on body, above everything */}
+			{open && popoverPos && createPortal(
+    <div
+        ref={popoverRef}
+        className="colour-picker-popover"
+        style={{ top: popoverPos.top, left: popoverPos.left }}
+    >
+        <HexColorPicker color={value} onChange={handleChange} />
+        <HexColorInput
+            className="colour-picker-hex-input"
+            color={value}
+            onChange={handleChange}
+            prefixed
+        />
+    </div>,
+    portalTarget
+)}
 		</Field>
 	);
 }
@@ -186,7 +208,7 @@ export function Dropdown({
 	options,
 	value: controlledValue,
 	onChange,
-	placeholder = "Placeholder",
+	placeholder = "Choose an option",
 	label,
 }: DropdownProps) {
 	const id = useId();

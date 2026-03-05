@@ -403,7 +403,7 @@ function App() {
 				<div className="modal-contents">
 					<TextInput
 						label="Title"
-						placeholder="PROG-1P01"
+						placeholder="MATH 101"
 						value={eventForm.name}
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 							setEventField("name", e.target.value)
@@ -413,7 +413,7 @@ function App() {
 
 					<TextInput
 						label="Details"
-						placeholder="Lab"
+						placeholder="Intro to Calculus"
 						value={eventForm.additionalInfo}
 						onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
 							setEventField("additionalInfo", e.target.value)
