@@ -73,7 +73,6 @@ export function Checkbox({
 	label,
 	disabled = false,
 }: CheckboxProps) {
-	const id = useId();
 	const isControlled = controlledChecked !== undefined;
 	const [internalChecked, setInternalChecked] = useState(false);
 	const checked = isControlled ? controlledChecked : internalChecked;
