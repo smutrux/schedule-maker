@@ -56,34 +56,75 @@ function rgbToHsl({ r, g, b }: ReturnType<typeof hexToRgb>) {
 }
 
 export function generateColourName(hex: string): string {
-	const { h, l } = rgbToHsl(hexToRgb(hex));
+	const { h, s, l } = rgbToHsl(hexToRgb(hex));
+
+	// Near-neutral: very low saturation
+	if (s < 0.08) {
+		if (l > 0.93) return "Near White";
+		if (l < 0.12) return "Near Black";
+		if (l > 0.60) return "Light Grey";
+		if (l > 0.38) return "Mid Grey";
+		return "Dark Grey";
+	}
+
+	// Lightness label
 	const lightness =
-		l > 0.85
-			? "Very Light"
-			: l > 0.7
-				? "Soft"
-				: l > 0.5
-					? "Calm"
-					: l > 0.35
-						? "Deep"
-						: "Dark";
+		l > 0.93
+			? "Barely"      // a hair off white
+			: l > 0.80
+				? "Very Light"
+				: l > 0.65
+					? "Bright"
+					: l > 0.50
+						? "Mid"
+						: l > 0.35
+							? "Deep"
+							: l > 0.10
+								? "Dark"
+								: "Barely";   // a hair off black
+
+	// Hue label — expanded set
 	const hue =
-		h < 15 || h >= 345
+		h < 12 || h >= 348
 			? "Red"
-			: h < 45
-				? "Peach"
-				: h < 70
+			: h < 38
+				? "Orange"
+				: h < 62
 					? "Yellow"
-					: h < 150
-						? "Green"
-						: h < 190
-							? "Aqua"
-							: h < 250
-								? "Blue"
-								: h < 290
-									? "Violet"
-									: "Pink";
-	return `${lightness} ${hue}`;
+					: h < 80
+						? "Lime"
+						: h < 150
+							? "Green"
+							: h < 172
+								? "Teal"
+								: h < 200
+									? "Aqua"
+									: h < 252
+										? "Blue"
+										: h < 278
+											? "Purple"
+											: h < 308
+												? "Violet"
+												: h < 332
+													? "Pink"
+													: "Rose";
+
+	// Saturation modifier — five buckets from barely-there to screaming
+	const saturation =
+		s < 0.20
+			? "Washed"    // very desaturated, pastel-adjacent
+			: s < 0.40
+				? "Muted"   // clearly coloured but soft
+				: s < 0.60
+					? ""        // neutral / no modifier needed
+					: s < 0.78
+						? "Rich"    // noticeably saturated
+						: s < 0.90
+							? "Vivid"   // punchy
+							: "Aggressive"; // maximum saturation
+
+	const parts = [lightness, saturation, hue].filter(Boolean);
+	return parts.join(" ");
 }
 
 // ── Default colours ───────────────────────────────────────────────────────────
@@ -158,6 +199,11 @@ export function buildEvent(form: EventForm): ScheduleEvent | null {
 
 export type FormErrors<T> = Partial<Record<keyof T, string>>;
 
+function timeToMinutes(hhmm: string): number {
+	const [h, m] = hhmm.split(":").map(Number);
+	return h * 60 + m;
+}
+
 export function validatePreferences(
 	form: PreferencesForm,
 ): FormErrors<PreferencesForm> {
@@ -168,7 +214,7 @@ export function validatePreferences(
 	if (
 		form.scheduleStart &&
 		form.scheduleEnd &&
-		form.scheduleStart >= form.scheduleEnd
+		timeToMinutes(form.scheduleStart) >= timeToMinutes(form.scheduleEnd)
 	)
 		e.scheduleEnd = "End time must be after start time.";
 	return e;
@@ -351,11 +397,19 @@ export async function downloadPDF(schedule: Schedule): Promise<void> {
 // ── Download: JPEG ────────────────────────────────────────────────────────────
 
 export async function downloadJPEG(schedule: Schedule): Promise<void> {
-	const { default: domtoimage } = await import("dom-to-image-more");
+	const { default: html2canvas } = await import("html2canvas");
 
-	const dataUrl = (await withVisiblePage((page) =>
-		domtoimage.toJpeg(page, { bgcolor: "#ffffff", quality: 0.95 }),
-	)) as string;
+	const canvas = await withVisiblePage((page) =>
+		html2canvas(page, {
+			scale: 3,                // 3× pixel density → ~2448×3168 px for letter
+			backgroundColor: "#ffffff",
+			useCORS: true,
+			logging: false,
+		}),
+	);
+
+	// Convert to high-quality JPEG data URL
+	const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
 
 	const a = document.createElement("a");
 	a.href = dataUrl;

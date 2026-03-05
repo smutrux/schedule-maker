@@ -355,7 +355,6 @@ function App() {
 						label="24 hr Time"
 						checked={prefsForm.is24hr}
 						onChange={(v) => setPrefsField("is24hr", v)}
-						disabled={isEditingExisting}
 					/>
 
 					<TimePicker

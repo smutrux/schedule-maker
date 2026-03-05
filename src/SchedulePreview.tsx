@@ -24,7 +24,7 @@ function formatTime(isoString: string, is24hr: boolean) {
 	const h = d.getUTCHours();
 	const m = d.getUTCMinutes();
 	const displayH = is24hr ? h : h % 12 || 12;
-	const displayM = m === 0 ? "00" : String(m);
+	const displayM = String(m).padStart(2, "0");
 	return `${displayH}:${displayM}`;
 }
 
@@ -45,7 +45,7 @@ function ScheduleGrid({ schedule }: Props) {
 	activeDays.sort((a, b) => DAYS_ORDER.indexOf(a) - DAYS_ORDER.indexOf(b));
 
 	const gridTemplateColumns = `60px repeat(${activeDays.length}, 1fr)`;
-	const gridTemplateRows = `40px repeat(${totalSlots}, 1fr)`;
+	const gridTemplateRows = `40px repeat(${totalSlots}, minmax(0, 1fr))`;
 
 	const timeSlots = Array.from({ length: totalSlots }, (_, i) => {
 		const currentMin = startMin + i * 30;
@@ -107,8 +107,25 @@ function ScheduleGrid({ schedule }: Props) {
 					const evtStartMin =
 						evtStart.getUTCHours() * 60 + evtStart.getUTCMinutes();
 					const evtEndMin = evtEnd.getUTCHours() * 60 + evtEnd.getUTCMinutes();
-					const startRow = (evtStartMin - startMin) / 30 + 2;
-					const spanRows = (evtEndMin - evtStartMin) / 30;
+
+					// Exact slot positions (may be fractional for off-grid times)
+					const startSlotExact = (evtStartMin - startMin) / 30;
+					const endSlotExact = (evtEndMin - startMin) / 30;
+
+					const startSlotFloor = Math.floor(startSlotExact);
+					const endSlotCeil = Math.ceil(endSlotExact);
+
+					// Fraction into the first row where the card actually starts (0–<1)
+					const topFraction = startSlotExact - startSlotFloor;
+
+					// The wrapper spans whole rows; the card is absolutely positioned inside
+					const gridRowStart = startSlotFloor + 2;
+					const gridRowSpan = endSlotCeil - startSlotFloor;
+
+					// top% and height% are relative to the wrapper's height (= gridRowSpan rows)
+					const topPct = (topFraction / gridRowSpan) * 100;
+					const heightPct = ((endSlotExact - startSlotExact) / gridRowSpan) * 100;
+
 					const timeLabel = `${formatTime(event.start, schedule["24hr"])} - ${formatTime(event.end, schedule["24hr"])}`;
 
 					return event.repeats.flatMap((day) => {
@@ -116,17 +133,26 @@ function ScheduleGrid({ schedule }: Props) {
 						if (colIndex === -1) return [];
 						const borderColor = colIndex % 2 === 0 ? "#eeeeee" : "#ffffff";
 						const strokeW = 12;
-						// SVG rect is inset by half stroke-width so the stroke sits on the card edge
 						return (
+							// Transparent wrapper occupies the exact grid rows
 							<div
 								key={`${event.name}-${day}`}
-								className="sp-event-card"
+								className="sp-event-wrapper"
 								style={{
-									backgroundColor: event.colour,
 									gridColumn: colIndex + 2,
-									gridRow: `${startRow} / span ${spanRows}`,
+									gridRow: `${gridRowStart} / span ${gridRowSpan}`,
 								}}
 							>
+								{/* Card is absolutely positioned inside the wrapper */}
+								<div
+									className="sp-event-card"
+									style={{
+										backgroundColor: event.colour,
+										top: `${topPct}%`,
+										height: `calc(${heightPct}% - 1px)`,
+										border: `1px solid ${borderColor}`,
+									}}
+								>
 								{/* SVG border overlay — solid for in-person, round-capped dashes for online */}
 								<svg className="sp-event-border" aria-hidden="true">
 									<rect
@@ -138,7 +164,7 @@ function ScheduleGrid({ schedule }: Props) {
 										stroke={borderColor}
 										strokeWidth={strokeW}
 										strokeLinecap={event.online ? "round" : "butt"}
-										strokeDasharray={event.online ? "16 32" : "none"}
+										strokeDasharray={event.online ? "16 24" : "none"}
 										rx={12}
 									/>
 								</svg>
@@ -150,6 +176,7 @@ function ScheduleGrid({ schedule }: Props) {
 								{event.online && (
 									<span className="sp-event-online">Online</span>
 								)}
+								</div>
 							</div>
 						);
 					});

@@ -16,7 +16,7 @@
 	.sp-page {
 		width: 8.5in !important;
 		height: 11in !important;
-		padding: 1in !important;
+		padding: 0.25in !important;
 		box-shadow: none !important;
 		position: fixed !important;
 		top: 0 !important;
@@ -25,7 +25,11 @@
 
 	/* Ensure background colours actually print */
 	.sp-col-alt-1,
-	.sp-event-card {
+	.sp-col-alt-2,
+	.sp-event-card,
+	.sp-header-cell,
+	.sp-time-cell,
+	.sp-grid-cell {
 		-webkit-print-color-adjust: exact;
 		print-color-adjust: exact;
 	}
@@ -74,10 +78,10 @@
 /* ── Grid ─────────────────────────────────────────────────────────────── */
 .sp-grid {
 	display: grid;
-	flex-grow: 1;
+	flex: 1 1 0;      /* grow AND start from 0 so height is explicit */
+	min-height: 0;    /* allow shrink below content size */
 	font-size: 11px;
 	position: relative;
-	/* Prevent grid from overflowing the page */
 	overflow: hidden;
 }
 
@@ -145,30 +149,36 @@
 	border-top: 1px solid #bebebe;
 }
 
+/* ── Event wrapper (transparent grid placement cell) ──────────────────── */
+.sp-event-wrapper {
+	position: relative;  /* establishes containing block for the card */
+	z-index: 10;
+}
+
 /* ── Event cards ──────────────────────────────────────────────────────── */
 .sp-event-card {
-	position: relative; /* anchor for the SVG overlay */
-	margin: 1px 1px 0 0;
+	position: absolute;  /* positioned within wrapper using top% + height% */
+	left: 0px;
+	right: 1px;
 	padding: 12px;
 	border-radius: 7px;
 	font-size: 0.75rem;
-	overflow: hidden;
-	z-index: 10;
+	/* overflow: hidden; */
 	color: #000;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
 	gap: 1px;
-	position: relative;
+	box-sizing: border-box;
+	margin-top: 1px;
 }
 
 .sp-event-border {
 	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
+	inset: -1px;
+	width: calc(100% + 2px);
+	height: calc(100% + 2px);
 	pointer-events: none;
-	overflow: hidden;
 }
 
 .sp-event-name {
