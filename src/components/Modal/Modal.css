@@ -115,4 +115,5 @@
 	overflow-y: auto;
 	color: var(--color-text);
 	gap: 2rem;
+	margin: 0 auto;
 }

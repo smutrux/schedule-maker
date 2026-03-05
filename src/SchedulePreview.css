@@ -49,7 +49,7 @@
 	/* Match physical letter size + 1in margins so screen preview = printed output */
 	width: 8.5in;
 	height: 11in;
-	padding: 0.5in;
+	padding: 0.25in;
 	background: white;
 	box-sizing: border-box;
 	display: flex;
@@ -132,6 +132,11 @@
 	background-color: #ffffff;
 }
 
+/* ── Last column ─────────────────────────────────────────────────────── */
+.sp-no-right-border {
+	border-right: none;
+}
+
 /* ── Row borders ──────────────────────────────────────────────────────── */
 .sp-border-black {
 	border-top: 1px solid #000;
@@ -176,6 +181,7 @@
 .sp-event-info {
 	font-size: 0.7rem;
 	color: #333;
+	text-align: left;
 }
 .sp-event-online {
 	font-size: 0.65rem;

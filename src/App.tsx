@@ -322,7 +322,13 @@ function App() {
 				onClose={() => setPreviewOpen(false)}
 				width="90vw"
 			>
-				{schedule && <SchedulePreview schedule={schedule} />}
+				{schedule && (
+					<div className="preview-scaler-outer">
+						<div className="preview-scaler-inner">
+							<SchedulePreview schedule={schedule} />
+						</div>
+					</div>
+				)}
 			</Modal>
 
 			{/* ── Preferences modal ─────────────────────────────────────── */}

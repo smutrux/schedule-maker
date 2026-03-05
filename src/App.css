@@ -94,3 +94,20 @@ p {
 		max-width: 800px;
 	}
 }
+
+/* ── Schedule preview scaler ───────────────────────────────────────────
+/* .sp-page is 8.5in = 816px wide. Scale it to fit 80vw exactly.         */
+.preview-scaler-outer {
+	width: 80vw;
+	/* Height collapses because the inner is scaled — restore it with the
+	   same ratio: 11in / 8.5in ≈ 1.2941 */
+	height: calc(80vw * (11 / 8.5));
+	/* overflow: hidden; */
+}
+
+.preview-scaler-inner {
+	transform-origin: top left;
+	/* scale factor: 80vw / 816px */
+	transform: scale(calc(80vw / 816px));
+	width: 816px; /* 8.5in at 96dpi */
+} 

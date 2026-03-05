@@ -67,8 +67,8 @@ function ScheduleGrid({ schedule }: Props) {
 			>
 				{/* Headers */}
 				<div className="sp-header-cell">Time</div>
-				{activeDays.map((day) => (
-					<div key={day} className="sp-header-cell">
+				{activeDays.map((day, dayIdx) => (
+					<div key={day} className={`sp-header-cell${dayIdx === activeDays.length - 1 ? " sp-no-right-border" : ""}`}>
 						{day.charAt(0).toUpperCase() + day.slice(1)}
 					</div>
 				))}
@@ -93,7 +93,7 @@ function ScheduleGrid({ schedule }: Props) {
 						...activeDays.map((day, colIdx) => (
 							<div
 								key={`cell-${i}-${day}`}
-								className={`sp-grid-cell ${borderClass} ${colIdx % 2 === 0 ? "sp-col-alt-1" : "sp-col-alt-2"}`}
+								className={`sp-grid-cell ${borderClass} ${colIdx % 2 === 0 ? "sp-col-alt-1" : "sp-col-alt-2"}${colIdx === activeDays.length - 1 ? " sp-no-right-border" : ""}`}
 								style={{ gridRow: row, gridColumn: colIdx + 2 }}
 							/>
 						)),
