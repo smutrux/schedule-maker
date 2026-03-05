@@ -22,6 +22,7 @@ import {
 	validateImport,
 	clearSchedule,
 	DEFAULT_COLOURS,
+	enrichCustomColourName,
 } from "./scheduleUtils";
 import type { Schedule, PreferencesForm, EventForm } from "./schedule.types";
 import type { FormErrors } from "./scheduleUtils";
@@ -154,6 +155,10 @@ function App() {
 			isEditingExisting ? (schedule?.events ?? []) : [],
 		);
 		setSchedule(built);
+		// Async patch: swap in the API name once it arrives
+		enrichCustomColourName(built).then((enriched) => {
+			if (enriched !== built) setSchedule(enriched);
+		});
 		setPrefsErrors({});
 		setPrefsOpen(false);
 	}

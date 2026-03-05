@@ -127,6 +127,36 @@ export function generateColourName(hex: string): string {
 	return parts.join(" ");
 }
 
+// ── Colour name lookup (async, with local fallback) ───────────────────────────
+
+export async function enrichCustomColourName(
+	schedule: Schedule,
+): Promise<Schedule> {
+	// Find the last colour — the custom one just added, if any
+	const last = schedule.colours[schedule.colours.length - 1];
+	// Only fetch for colours not in the original DEFAULT_COLOURS set
+	const isDefault = DEFAULT_COLOURS.some((c) => c.colour === last?.colour);
+	if (!last || isDefault) return schedule;
+
+	try {
+		const hex = last.colour.replace("#", "");
+		const res = await fetch(`https://www.thecolorapi.com/id?hex=${hex}`);
+		if (!res.ok) return schedule;
+		const data = await res.json();
+		const apiName: string = data?.name?.value;
+		if (!apiName) return schedule;
+
+		// Patch just that colour entry's name
+		const updatedColours = schedule.colours.map((c) =>
+			c.colour === last.colour ? { ...c, name: apiName } : c,
+		);
+		return { ...schedule, colours: updatedColours };
+	} catch {
+		// Network failure — local name stays
+		return schedule;
+	}
+}
+
 // ── Default colours ───────────────────────────────────────────────────────────
 
 export const DEFAULT_COLOURS: ColourEntry[] = [
