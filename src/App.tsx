@@ -338,9 +338,7 @@ function App() {
 
 			{/* ── Preferences modal ─────────────────────────────────────── */}
 			<Modal
-				title={
-					hasSchedule ? "Edit Schedule Preferences" : "Schedule Preferences"
-				}
+				title={isEditingExisting ? "Edit Schedule Preferences" : "New Schedule"}
 				isOpen={prefsOpen}
 				onClose={() => setPrefsOpen(false)}
 				width={700}
