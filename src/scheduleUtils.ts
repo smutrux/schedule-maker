@@ -1,3 +1,18 @@
+/**
+ * scheduleUtils.ts
+ *
+ * Pure utility functions and side-effectful helpers that operate on the
+ * Schedule data model.  Grouped into sections:
+ *
+ *  Colour utilities   — hex/RGB/HSL conversion, near-duplicate detection,
+ *                       and a local hue/saturation/lightness colour namer.
+ *  Colour name API    — async enrichment via thecolorapi.com with local fallback.
+ *  Default colours    — the six built-in pastel swatches.
+ *  Build helpers      — buildSchedule(), buildEvent()
+ *  Validation         — validatePreferences(), validateEvent(), validateImport()
+ *  localStorage       — saveSchedule(), loadSchedule(), clearSchedule()
+ *  Downloads          — downloadJSON(), downloadPDF(), downloadJPEG()
+ */
 import type {
 	ColourEntry,
 	PreferencesForm,

@@ -1,3 +1,4 @@
+/* ── App root ─────────────────────────────────────────────────────────────── */
 #root {
 	max-width: 1280px;
 	margin: 0 auto;
@@ -5,34 +6,18 @@
 	text-align: center;
 }
 
-h1,
-p {
+/* Prevent default margins on the page heading and subtitle */
+#root h1,
+#root p {
 	margin: 0 auto;
 }
 
-@keyframes logo-spin {
-	from {
-		transform: rotate(0deg);
-	}
-	to {
-		transform: rotate(360deg);
-	}
-}
+/* ── Main content layout ──────────────────────────────────────────────────── */
 
-@media (prefers-reduced-motion: no-preference) {
-	a:nth-of-type(2) .logo {
-		animation: logo-spin infinite 20s linear;
-	}
-}
-
-.card {
-	padding: 2em;
-}
-
-.read-the-docs {
-	color: #888;
-}
-
+/**
+ * Vertical flex container that centers and stacks all top-level page elements:
+ * heading, button toolbar, schedule summary, and modals.
+ */
 .content-wrapper {
 	display: flex;
 	flex-direction: column;
@@ -40,6 +25,11 @@ p {
 	gap: 0.75rem;
 }
 
+/* ── Action button grids ──────────────────────────────────────────────────── */
+
+/**
+ * 2-column grid for the main toolbar. Expands to 4 columns at ≥768px.
+ */
 .btn-large-grid {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -49,6 +39,16 @@ p {
 	margin: 0 auto;
 }
 
+@media screen and (min-width: 768px) {
+	.btn-large-grid {
+		grid-template-columns: repeat(4, 1fr);
+		max-width: 800px;
+	}
+}
+
+/**
+ * 2-column grid used inside the Download modal.
+ */
 .modal-large-grid {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
@@ -58,6 +58,12 @@ p {
 	margin: 0 auto;
 }
 
+/* ── Modal form layout ────────────────────────────────────────────────────── */
+
+/**
+ * Wrapping flex row for form inputs inside modals (Preferences, Add Item).
+ * Fields wrap naturally; use .modal-row-break to force a full-width line break.
+ */
 .modal-contents {
 	display: flex;
 	flex-direction: row;
@@ -66,21 +72,40 @@ p {
 	justify-content: center;
 }
 
-/* ── Schedule summary ─────────────────────────────────────────────────── */
+/* Full-width invisible element that forces subsequent items onto a new row */
+.modal-row-break {
+	width: 100%;
+}
+
+/* Centered single-button row (Save / Add Item) */
+.modal-action-row {
+	display: flex;
+	justify-content: center;
+	width: 100%;
+}
+
+/* ── Schedule summary bar ─────────────────────────────────────────────────── */
+
+/**
+ * Pill-style info bar displayed below the toolbar when a schedule is active.
+ * Shows the schedule name and total event count.
+ */
 .schedule-summary {
 	margin-top: 1.5rem;
+	margin-inline: auto;
 	padding: 1rem 1.25rem;
+	max-width: 800px;
 	background: var(--color-surface);
 	border: 1.5px solid var(--color-border);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-sm);
 	color: var(--color-text-muted);
 	font-size: 0.95rem;
-	max-width: 800px;
-	margin-inline: auto;
 }
 
-/* ── Form validation errors ───────────────────────────────────────────── */
+/* ── Form validation errors ───────────────────────────────────────────────── */
+
+/** Inline error text rendered beneath an invalid form field. */
 .form-error {
 	color: var(--color-error);
 	font-size: 0.8rem;
@@ -88,26 +113,50 @@ p {
 	width: 100%;
 }
 
-@media screen and (min-width: 768px) {
-	.btn-large-grid {
-		grid-template-columns: repeat(4, 1fr);
-		max-width: 800px;
-	}
-}
+/* ── Schedule preview scaler ──────────────────────────────────────────────── */
 
-/* ── Schedule preview scaler ───────────────────────────────────────────
-/* .sp-page is 8.5in = 816px wide. Scale it to fit 80vw exactly.         */
+/**
+ * Two-element CSS trick to scale an 8.5in × 11in letter page (816px wide
+ * at 96 dpi) into a 80vw preview container.
+ *
+ * .preview-scaler-outer  — reserves the correct bounding-box dimensions in
+ *                          document flow (width: 80vw, height via aspect ratio).
+ * .preview-scaler-inner  — applies CSS scale() so the 816px .sp-page fits
+ *                          exactly within the outer container.
+ *
+ * Height formula: 80vw × (11 / 8.5) restores the page aspect ratio that
+ * would otherwise collapse once the inner element is scaled out-of-flow.
+ */
 .preview-scaler-outer {
 	width: 80vw;
-	/* Height collapses because the inner is scaled — restore it with the
-	   same ratio: 11in / 8.5in ≈ 1.2941 */
 	height: calc(80vw * (11 / 8.5));
-	/* overflow: hidden; */
 }
 
 .preview-scaler-inner {
 	transform-origin: top left;
-	/* scale factor: 80vw / 816px */
+	/* scale factor: 80vw / 816px (8.5in at 96 dpi) */
 	transform: scale(calc(80vw / 816px));
-	width: 816px; /* 8.5in at 96dpi */
-} 
+	width: 816px;
+}
+
+/* ── Import error modal ───────────────────────────────────────────────────── */
+
+/** Centered column layout for the import-error alert dialog body. */
+.modal-alert-body {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 1.25rem;
+	padding: 0.5rem 0;
+}
+
+/** Error message text inside the import-error alert. */
+.modal-alert-text {
+	margin: 0;
+	text-align: center;
+}
+
+/** Full-width variant of .form-error (used for day-selection validation). */
+.form-error-full {
+	width: 100%;
+}

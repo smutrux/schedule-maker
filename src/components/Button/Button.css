@@ -1,24 +1,36 @@
-/* ── Base button ──────────────────────────────────────────────────────── */
+/**
+ * Button.css
+ *
+ * Two visual variants:
+ *   .btn            — compact pill button (default)
+ *   .btn.btn-large  — card-style stacked button (toolbar)
+ *
+ * Shared modifier:
+ *   .btn-disabled   — muted appearance + blocks interaction
+ */
+
+/* ── Default (pill) variant ───────────────────────────────────────────────── */
+
 .btn {
+	display: inline-flex;
 	align-items: center;
+	gap: 0.5rem;
+	height: 3rem;
+	padding: 0 0.75rem;
 	background: var(--color-primary);
 	border: none;
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
 	color: var(--color-surface);
 	cursor: pointer;
-	display: inline-flex;
-	font-weight: 700;
+	font-family: "Poppins", system-ui, Helvetica, sans-serif;
 	font-size: 1.2rem;
-	gap: 0.5rem;
-	height: 3rem;
-	padding: 0 0.75rem;
+	font-weight: 700;
 	transform: translateY(0);
 	transition:
 		transform 90ms ease-out,
 		box-shadow 90ms ease-out,
 		background-color var(--transition-fast);
-	font-family: "Poppins", system-ui, Helvetica, sans-serif;
 }
 
 .btn:hover {
@@ -37,52 +49,42 @@
 	transform: translateY(1.5px) scale(0.98);
 }
 
-.btn-text {
-	margin: 0 0.5rem;
-}
-
+/* Icon wrapper */
 .btn-icon {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
 }
 
-/* Icon-only: square */
+/* Label wrapper */
+.btn-text {
+	margin: 0 0.5rem;
+}
+
+/* Icon-only mode: collapse to a square when there is no label */
 .btn:has(.btn-icon):not(:has(.btn-text)) {
 	width: 3rem;
 	padding: 0;
 	justify-content: center;
 }
 
-/* ── Disabled (all variants) ──────────────────────────────────────────── */
-.btn-disabled,
-.btn-disabled:hover,
-.btn-disabled:active {
-	background: transparent;
-	box-shadow: none;
-	color: var(--color-text-disabled);
-	cursor: not-allowed;
-	filter: none;
-	transform: none;
-	border: 1.5px solid var(--color-border);
-}
+/* ── Large (card) variant ─────────────────────────────────────────────────── */
 
-/* ── Large variant ────────────────────────────────────────────────────── */
 .btn-large {
+	display: inline-flex;
+	flex-direction: column;
+	align-items: center;
+	width: auto;
+	min-width: 0;
+	height: auto;
+	padding: 0;
+	gap: 0;
 	background: var(--color-surface);
 	border: 1.5px solid var(--color-border);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
 	color: var(--color-text);
 	cursor: pointer;
-	display: inline-flex;
-	flex-direction: column;
-	align-items: center;
-	width: auto;
-	min-width: 0;
-	padding: 0;
-	height: auto;
-	gap: 0;
 	font-size: 1rem;
 	font-weight: 700;
 	transition:
@@ -104,6 +106,7 @@
 	transform: translateY(1px) scale(0.98);
 }
 
+/* Icon area — square with aspect-ratio padding */
 .btn-large-icon {
 	display: flex;
 	align-items: center;
@@ -114,7 +117,8 @@
 	box-sizing: border-box;
 }
 
-.btn-large-icon .material-symbols-outlined {
+/* Responsive icon size: clamps from 1.5rem to 3rem across viewport widths */
+.btn-large-icon .material-symbols-rounded {
 	font-size: clamp(1.5rem, 8vw, 3rem);
 	width: 100%;
 	height: 100%;
@@ -123,6 +127,7 @@
 	justify-content: center;
 }
 
+/* Label area */
 .btn-large-text {
 	padding: 0.5rem 0.75rem 0.75rem;
 	box-sizing: border-box;
@@ -135,18 +140,33 @@
 	width: 100%;
 }
 
-/* Disabled large */
+/* ── Disabled state (both variants) ──────────────────────────────────────── */
+
+.btn-disabled,
+.btn-disabled:hover,
+.btn-disabled:active {
+	background: transparent;
+	box-shadow: none;
+	color: var(--color-text-disabled);
+	cursor: not-allowed;
+	filter: none;
+	transform: none;
+	border: 1.5px solid var(--color-border);
+}
+
+/* Large-disabled overrides the default disabled border/background */
 .btn-large.btn-disabled,
 .btn-large.btn-disabled:hover,
 .btn-large.btn-disabled:active {
-	border-color: var(--color-border);
 	background: var(--color-surface);
+	border-color: var(--color-border);
+	box-shadow: var(--shadow-md);
 	color: var(--color-text-disabled);
 	cursor: not-allowed;
 	transform: none;
-	box-shadow: var(--shadow-md);
 }
 
+/* Propagate muted colour to child elements */
 .btn-large.btn-disabled .btn-large-text,
 .btn-large.btn-disabled .btn-large-icon {
 	color: var(--color-text-disabled);

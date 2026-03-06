@@ -1,3 +1,26 @@
+/**
+ * App.tsx
+ *
+ * Root application component for Pretty Schedule Maker.
+ *
+ * Responsibilities:
+ *  - Owns all top-level state: active schedule, open modals, form values,
+ *    validation errors, download progress, and import errors.
+ *  - Persists the schedule to localStorage on every change and restores it
+ *    on mount.
+ *  - Delegates rendering to modal-hosted form components (TextInput, Checkbox,
+ *    TimePicker, ColourPicker, Dropdown) and the SchedulePreview/print root.
+ *
+ * State overview:
+ *  schedule          — the current Schedule document (null when none started).
+ *  prefsOpen         — controls the New / Edit Preferences modal.
+ *  itemOpen          — controls the Add Item modal.
+ *  downloadOpen      — controls the Download format picker modal.
+ *  previewOpen       — controls the live schedule preview modal.
+ *  downloading       — tracks which download ("pdf" | "jpeg") is in flight.
+ *  isEditingExisting — distinguishes "New Schedule" from "Edit Preferences".
+ *  importError       — non-null string triggers the import error modal.
+ */
 import "./App.css";
 import { useState, useEffect, useRef } from "react";
 import { Button } from "./components/Button";
@@ -386,8 +409,8 @@ function App() {
 						onChange={(v) => setPrefsField("customColour", v)}
 					/>
 
-					<div style={{ width: "100%" }} />
-					<div style={{ display: "flex", justifyContent: "center" }}>
+					<div className="modal-row-break" />
+					<div className="modal-action-row">
 						<Button text="Save" icon="save" onClick={handleSavePrefs} />
 					</div>
 				</div>
@@ -454,7 +477,7 @@ function App() {
 						onChange={(v) => setEventField("online", v)}
 					/>
 
-					<div style={{ width: "100%" }} />
+					<div className="modal-row-break" />
 
 					{DAYS.map((day) => (
 						<Checkbox
@@ -465,14 +488,14 @@ function App() {
 						/>
 					))}
 					{eventErrors.monday && (
-						<p className="form-error" style={{ width: "100%" }}>
+						<p className="form-error form-error-full">
 							{eventErrors.monday}
 						</p>
 					)}
 
-					<div style={{ width: "100%" }} />
+					<div className="modal-row-break" />
 					<div
-						style={{ display: "flex", justifyContent: "center", width: "100%" }}
+						className="modal-action-row"
 					>
 						<Button text="Add Item" icon="add_ad" onClick={handleAddEvent} />
 					</div>
@@ -532,16 +555,8 @@ function App() {
 				isOpen={importError !== null}
 				onClose={() => setImportError(null)}
 			>
-				<div
-					style={{
-						display: "flex",
-						flexDirection: "column",
-						alignItems: "center",
-						gap: "1.25rem",
-						padding: "0.5rem 0",
-					}}
-				>
-					<p style={{ margin: 0, textAlign: "center" }}>{importError}</p>
+				<div className="modal-alert-body">
+					<p className="modal-alert-text">{importError}</p>
 					<Button text="OK" icon="check" onClick={() => setImportError(null)} />
 				</div>
 			</Modal>

@@ -1,3 +1,11 @@
+/**
+ * Input component type definitions.
+ *
+ * All form input components (TextInput, Checkbox, ColourPicker, Dropdown,
+ * TimePicker) are implemented in Input.tsx and re-exported from there.
+ * This file only contains the shared prop types so they can be imported
+ * independently without pulling in the full component module.
+ */
 import type { InputHTMLAttributes } from "react";
 
 export type TextInputProps = {
@@ -35,5 +43,6 @@ export type TimePickerProps = {
 	value?: string;
 	onChange?: (value: string) => void;
 	label?: string;
+	/** When true, display times in 24-hour format; otherwise use 12-hour a.m./p.m. */
 	is24hr?: boolean;
 };

@@ -1,3 +1,27 @@
+/**
+ * SchedulePreview.tsx
+ *
+ * Renders the visual weekly schedule grid — shared between the modal preview
+ * and the hidden print/capture target.
+ *
+ * Exports:
+ *  SchedulePreview    — render-only grid for display inside the preview modal.
+ *  SchedulePrintRoot  — hidden container mounted directly on <body> so that
+ *                       @media print { body > * } targeting works correctly.
+ *                       Also used as the capture target for PDF / JPEG export.
+ *  printSchedule      — calls window.print() to trigger the browser print dialog.
+ *
+ * Grid layout:
+ *  Column 0     — time labels (60px fixed)
+ *  Columns 1..N — one per active day (Mon–Fri always; Sat/Sun added dynamically)
+ *  Row 0        — day headers
+ *  Rows 1..M    — 30-minute slots covering scheduleStart → scheduleEnd
+ *
+ * Event positioning:
+ *  Each event card spans one or more slot rows via CSS grid-row.
+ *  Off-grid start/end times are handled with fractional top% / height% values
+ *  inside an absolutely positioned wrapper that occupies the full row span.
+ */
 import { useEffect, useRef } from "react";
 import type { Schedule } from "./schedule.types";
 import "./SchedulePreview.css";

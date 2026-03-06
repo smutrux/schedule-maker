@@ -1,3 +1,14 @@
+/**
+ * schedule.types.ts
+ *
+ * Shared TypeScript type definitions for the schedule data model and forms.
+ *
+ *  ColourEntry     — a named colour swatch (name + hex string).
+ *  ScheduleEvent   — a single recurring calendar event block.
+ *  Schedule        — the top-level serialisable schedule document.
+ *  PreferencesForm — form state for the New / Edit Preferences modal.
+ *  EventForm       — form state for the Add Item modal.
+ */
 export type ColourEntry = {
 	name: string;
 	colour: string;

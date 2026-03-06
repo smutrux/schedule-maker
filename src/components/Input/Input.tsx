@@ -1,3 +1,20 @@
+/**
+ * Input.tsx
+ *
+ * Form input components, all supporting both controlled and uncontrolled usage:
+ *
+ *  TextInput     — single-line text field with optional label.
+ *  Checkbox      — custom styled checkbox with optional label and disabled state.
+ *  ColourPicker  — swatch trigger that opens a floating HexColorPicker popover
+ *                  via a React portal (portals into the parent <dialog> when
+ *                  inside a modal, otherwise into document.body).
+ *  Dropdown      — styled <select> with chevron icon and placeholder support.
+ *  TimePicker    — clickable display that delegates to a hidden native
+ *                  <input type="time">; shows formatted 12h or 24h output.
+ *
+ * All components use the Field wrapper which renders an accessible <label>
+ * when a `label` prop is provided.
+ */
 import { useRef, useEffect, useState, useId } from "react";
 import { createPortal } from "react-dom";
 import { HexColorPicker, HexColorInput } from "react-colorful";

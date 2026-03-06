@@ -1,3 +1,15 @@
+/**
+ * SchedulePreview.css
+ *
+ * Styles for the printable / exportable schedule grid.
+ * Covers:
+ *  - @page and @media print setup
+ *  - Hidden print root (.sp-print-root) and capture-mode reveal
+ *  - Page wrapper, title, grid, header cells, time column
+ *  - Background column cells, row border variants
+ *  - Event card wrapper, card, SVG border overlay, text elements
+ */
+
 /* ── Print setup ──────────────────────────────────────────────────────── */
 @page {
 	size: letter portrait;
@@ -99,7 +111,6 @@
 	position: sticky;
 	top: 0;
 	z-index: 2;
-	/* border-bottom: 2px solid #333; */
 }
 
 /* ── Time column ──────────────────────────────────────────────────────── */
@@ -158,12 +169,11 @@
 /* ── Event cards ──────────────────────────────────────────────────────── */
 .sp-event-card {
 	position: absolute;  /* positioned within wrapper using top% + height% */
-	left: 0px;
+	left: 0;
 	right: 1px;
 	padding: 12px;
 	border-radius: 12px;
 	font-size: 0.75rem;
-	/* overflow: hidden; */
 	color: #000;
 	display: flex;
 	flex-direction: column;

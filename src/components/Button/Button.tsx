@@ -1,11 +1,26 @@
+/**
+ * Button.tsx
+ *
+ * Reusable button component with two visual variants:
+ *
+ *  - Default  — compact pill button with primary background, icon + label side-by-side.
+ *  - Large    — card-style button with icon stacked above label, used in the main toolbar.
+ *
+ * Both variants support a disabled state and an optional icon-only mode
+ * (when `text` is omitted the default button renders as a square icon button).
+ */
 import type { ButtonHTMLAttributes } from "react";
 import { Icon } from "../Icon";
 import "./Button.css";
 
 type ButtonProps = {
+	/** Button label text. If omitted, the default variant renders icon-only. */
 	text?: string;
+	/** Material Symbols icon name (see Icon component). */
 	icon?: string;
+	/** Reverse the default icon → text order (default variant only). */
 	reverse?: boolean;
+	/** Render the large card variant instead of the default pill. */
 	large?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
@@ -17,6 +32,7 @@ export function Button({
 	disabled,
 	...props
 }: ButtonProps) {
+	/* ── Large (card) variant ─────────────────────────────────────────────── */
 	if (large) {
 		return (
 			<button
@@ -34,6 +50,7 @@ export function Button({
 		);
 	}
 
+	/* ── Default (pill) variant ───────────────────────────────────────────── */
 	const iconEl = icon && (
 		<span className="btn-icon">
 			<Icon name={icon} />

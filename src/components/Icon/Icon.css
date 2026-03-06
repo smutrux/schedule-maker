@@ -1,5 +1,11 @@
-.material-symbols-outlined {
-  font-size: 1.5rem;
+/**
+ * Icon.css
+ * Styles for the <Icon> component, which renders Google Material Symbols
+ * using the "rounded" variant font class.
+ */
+
+.material-symbols-rounded {
+	font-size: 1.5rem;
 	display: inline-flex;
 	line-height: 1;
 	user-select: none;

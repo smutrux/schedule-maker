@@ -1,3 +1,25 @@
+/**
+ * Modal.tsx
+ *
+ * Accessible modal dialog built on the native HTML <dialog> element.
+ *
+ * Features:
+ *  - Uses showModal() / close() for proper focus-trap and backdrop support.
+ *  - Backdrop click closes the modal; clicks inside the content do not.
+ *  - Suppresses the browser's default Escape-key dismiss so that close state
+ *    is always managed by the parent (prevents out-of-sync open/close state).
+ *  - Width and height are overrideable via props; the default is a responsive
+ *    clamp between 300px and 560px.
+ *
+ * Props:
+ *  title        — heading shown in the modal header.
+ *  isOpen       — controls whether the dialog is shown.
+ *  onClose      — callback invoked when the user closes the modal.
+ *  width        — optional CSS value or pixel number to override default width.
+ *  height       — optional CSS value or pixel number to override default height.
+ *  aspectRatio  — optional CSS aspect-ratio string.
+ *  children     — content rendered in the scrollable body area.
+ */
 import { useEffect, useRef } from "react";
 import { Icon } from "../Icon";
 import "./Modal.css";
