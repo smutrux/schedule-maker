@@ -15,7 +15,7 @@
  * All components use the Field wrapper which renders an accessible <label>
  * when a `label` prop is provided.
  */
-import { useRef, useEffect, useState, useId } from "react";
+import { useRef, useEffect, useLayoutEffect, useState, useId } from "react";
 import { createPortal } from "react-dom";
 import { HexColorPicker, HexColorInput } from "react-colorful";
 
@@ -143,6 +143,7 @@ export function ColourPicker({
 		top: number;
 		left: number;
 	} | null>(null);
+	const [popoverReady, setPopoverReady] = useState(false);
 	const [portalTarget, setPortalTarget] = useState<Element>(document.body);
 
 	function handleChange(hex: string) {
@@ -155,18 +156,47 @@ export function ColourPicker({
 			setOpen(false);
 			return;
 		}
+		// Store the trigger rect so the layout effect can compute position after mount
 		const rect = swatchRef.current?.getBoundingClientRect();
 		if (rect) {
+			// Tentatively centre below the swatch; clamped after mount in the effect
 			setPopoverPos({
 				top: rect.bottom + 8,
-				left: rect.left,
+				left: rect.left + rect.width / 2 - 110, // 110 = half of 220px popover width
 			});
 		}
+		setPopoverReady(false);
 		// Portal into the dialog if inside one, otherwise body
 		const dialog = swatchRef.current?.closest("dialog");
 		setPortalTarget(dialog ?? document.body);
 		setOpen(true);
 	}
+
+	// After the popover mounts, measure it and clamp so it never escapes the viewport
+	useLayoutEffect(() => {
+		if (!open || !popoverRef.current || !swatchRef.current) return;
+		const pop = popoverRef.current.getBoundingClientRect();
+		const swatch = swatchRef.current.getBoundingClientRect();
+		const margin = 8;
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+
+		let left = swatch.left + swatch.width / 2 - pop.width / 2;
+		let top = swatch.bottom + margin;
+
+		// Clamp horizontally
+		left = Math.max(margin, Math.min(left, vw - pop.width - margin));
+
+		// If it overflows the bottom, flip above the swatch
+		if (top + pop.height > vh - margin) {
+			top = swatch.top - pop.height - margin;
+		}
+		// If it still overflows the top (very short viewport), pin to top
+		top = Math.max(margin, top);
+
+		setPopoverPos({ top, left });
+		setPopoverReady(true);
+	}, [open]);
 
 	// Close on click outside both the trigger and the popover
 	useEffect(() => {
@@ -199,22 +229,28 @@ export function ColourPicker({
 			</div>
 
 			{/* Floating picker portal — renders on body, above everything */}
-			{open && popoverPos && createPortal(
-    <div
-        ref={popoverRef}
-        className="colour-picker-popover"
-        style={{ top: popoverPos.top, left: popoverPos.left }}
-    >
-        <HexColorPicker color={value} onChange={handleChange} />
-        <HexColorInput
-            className="colour-picker-hex-input"
-            color={value}
-            onChange={handleChange}
-            prefixed
-        />
-    </div>,
-    portalTarget
-)}
+			{open &&
+				popoverPos &&
+				createPortal(
+					<div
+						ref={popoverRef}
+						className="colour-picker-popover"
+						style={{
+							top: popoverPos.top,
+							left: popoverPos.left,
+							visibility: popoverReady ? "visible" : "hidden",
+						}}
+					>
+						<HexColorPicker color={value} onChange={handleChange} />
+						<HexColorInput
+							className="colour-picker-hex-input"
+							color={value}
+							onChange={handleChange}
+							prefixed
+						/>
+					</div>,
+					portalTarget,
+				)}
 		</Field>
 	);
 }
