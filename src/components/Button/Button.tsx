@@ -30,13 +30,14 @@ export function Button({
 	reverse,
 	large,
 	disabled,
+	className,
 	...props
 }: ButtonProps) {
 	/* ── Large (card) variant ─────────────────────────────────────────────── */
 	if (large) {
 		return (
 			<button
-				className={`btn btn-large ${disabled ? "btn-disabled" : ""}`}
+				className={`btn btn-large ${disabled ? "btn-disabled" : ""} ${className ?? ""}`}
 				disabled={disabled}
 				{...props}
 			>
@@ -60,7 +61,7 @@ export function Button({
 
 	return (
 		<button
-			className={`btn ${disabled ? "btn-disabled" : ""}`}
+			className={`btn ${disabled ? "btn-disabled" : ""} ${className ?? ""}`}
 			disabled={disabled}
 			{...props}
 		>

@@ -7,6 +7,9 @@
  *
  * Shared modifier:
  *   .btn-disabled   — muted appearance + blocks interaction
+ *
+ * State modifier:
+ *   .btn-large-active — inverted (dark bg, light text) to signal an active toggle
  */
 
 /* ── Default (pill) variant ───────────────────────────────────────────────── */
@@ -90,7 +93,8 @@
 	transition:
 		box-shadow 90ms ease-out,
 		border-color var(--transition-fast),
-		background-color var(--transition-fast);
+		background-color var(--transition-fast),
+		color var(--transition-fast);
 }
 
 .btn-large:hover {
@@ -138,6 +142,29 @@
 	font-size: 1rem;
 	color: var(--color-text);
 	width: 100%;
+	transition: color var(--transition-fast);
+}
+
+/* ── Active / toggled state (large variant only) ─────────────────────────── */
+
+.btn-large.btn-large-active,
+.btn-large.btn-large-active:hover {
+	background: var(--color-text);
+	border-color: var(--color-text);
+	color: var(--color-surface);
+	background-image: none;
+	filter: none;
+}
+
+.btn-large.btn-large-active .btn-large-text {
+	color: var(--color-surface);
+}
+
+.btn-large.btn-large-active:active {
+	background: var(--color-text-muted);
+	border-color: var(--color-text-muted);
+	box-shadow: var(--shadow-sm);
+	transform: translateY(1px) scale(0.98);
 }
 
 /* ── Disabled state (both variants) ──────────────────────────────────────── */

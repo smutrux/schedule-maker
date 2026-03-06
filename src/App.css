@@ -1,9 +1,12 @@
 /* ── App root ─────────────────────────────────────────────────────────────── */
 #root {
+	width: 100%;
 	max-width: 1280px;
 	margin: 0 auto;
 	padding: 2rem;
 	text-align: center;
+	box-sizing: border-box;
+	overflow-x: hidden;
 }
 
 /* Prevent default margins on the page heading and subtitle */
@@ -116,26 +119,23 @@
 /* ── Schedule preview scaler ──────────────────────────────────────────────── */
 
 /**
- * Two-element CSS trick to scale an 8.5in × 11in letter page (816px wide
- * at 96 dpi) into a 80vw preview container.
+ * The preview is portalled directly onto <body> so it never influences
+ * the width of #root or .content-wrapper.
  *
- * .preview-scaler-outer  — reserves the correct bounding-box dimensions in
- *                          document flow (width: 80vw, height via aspect ratio).
- * .preview-scaler-inner  — applies CSS scale() so the 816px .sp-page fits
- *                          exactly within the outer container.
- *
- * Height formula: 80vw × (11 / 8.5) restores the page aspect ratio that
- * would otherwise collapse once the inner element is scaled out-of-flow.
+ * .preview-scaler-outer  — 90vw wide, centred with auto margins, height set
+ *                          via aspect ratio so it reserves the right space in flow.
+ * .preview-scaler-inner  — scales the fixed 816px .sp-page down to fit.
  */
 .preview-scaler-outer {
-	width: 80vw;
-	height: calc(80vw * (11 / 8.5));
+	width: 90vw;
+	height: calc(90vw * (11 / 8.5));
+	margin: 2rem auto 2rem;
 }
 
 .preview-scaler-inner {
 	transform-origin: top left;
-	/* scale factor: 80vw / 816px (8.5in at 96 dpi) */
-	transform: scale(calc(80vw / 816px));
+	/* scale factor: 90vw / 816px (8.5in at 96 dpi) */
+	transform: scale(calc(90vw / 816px));
 	width: 816px;
 }
 
