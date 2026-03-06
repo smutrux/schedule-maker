@@ -145,8 +145,17 @@ function App() {
 	}));
 
 	// ── Preferences ─────────────────────────────────────────────────────
+	function randomHex() {
+		return (
+			"#" +
+			Math.floor(Math.random() * 0xffffff)
+				.toString(16)
+				.padStart(6, "0")
+		);
+	}
+
 	function openNewSchedule() {
-		setPrefsForm(EMPTY_PREFS);
+		setPrefsForm({ ...EMPTY_PREFS, customColour: randomHex() });
 		setPrefsErrors({});
 		setIsEditingExisting(false);
 		setPrefsOpen(true);
@@ -160,7 +169,7 @@ function App() {
 			scheduleStart: schedule.scheduleStart,
 			scheduleEnd: schedule.scheduleEnd,
 			is24hr: schedule["24hr"],
-			customColour: "#6b93c4",
+			customColour: randomHex(),
 		});
 		setPrefsErrors({});
 		setPrefsOpen(true);

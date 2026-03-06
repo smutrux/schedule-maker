@@ -52,6 +52,21 @@ function formatTime(isoString: string, is24hr: boolean) {
 	return `${displayH}:${displayM}`;
 }
 
+// Returns "#000" or "#fff" depending on which has better contrast against the
+// given hex background, using the WCAG relative luminance formula.
+function readableTextColour(hex: string): "#000000" | "#ffffff" {
+	const n = parseInt(hex.replace("#", ""), 16);
+	const toLinear = (c: number) => {
+		const s = c / 255;
+		return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+	};
+	const r = toLinear((n >> 16) & 255);
+	const g = toLinear((n >> 8) & 255);
+	const b = toLinear(n & 255);
+	const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+	return L > 0.179 ? "#000000" : "#ffffff";
+}
+
 // ── Shared grid builder (used by both preview and print) ──────────────────────
 
 function ScheduleGrid({ schedule }: Props) {
@@ -161,6 +176,7 @@ function ScheduleGrid({ schedule }: Props) {
 						if (colIndex === -1) return [];
 						const borderColor = colIndex % 2 === 0 ? "#eeeeee" : "#ffffff";
 						const strokeW = 6;
+						const textColour = readableTextColour(event.colour);
 						return (
 							// Transparent wrapper occupies the exact grid rows
 							<div
@@ -179,6 +195,7 @@ function ScheduleGrid({ schedule }: Props) {
 										top: `${topPct}%`,
 										height: `calc(${heightPct}% - 1px)`,
 										border: `1px solid ${borderColor}`,
+										color: textColour,
 									}}
 								>
 									{/* SVG border overlay — solid for in-person, dashes for online */}

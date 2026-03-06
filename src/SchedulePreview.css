@@ -90,10 +90,11 @@
 /* ── Grid ─────────────────────────────────────────────────────────────── */
 .sp-grid {
 	display: grid;
-	flex: 1 1 0;      /* grow AND start from 0 so height is explicit */
-	min-height: 0;    /* allow shrink below content size */
+	flex: 1 1 0; /* grow AND start from 0 so height is explicit */
+	min-height: 0; /* allow shrink below content size */
 	font-size: 11px;
 	position: relative;
+	overflow: hidden;
 }
 
 /* ── Header cells ─────────────────────────────────────────────────────── */
@@ -161,19 +162,18 @@
 
 /* ── Event wrapper (transparent grid placement cell) ──────────────────── */
 .sp-event-wrapper {
-	position: relative;  /* establishes containing block for the card */
+	position: relative; /* establishes containing block for the card */
 	z-index: 10;
 }
 
 /* ── Event cards ──────────────────────────────────────────────────────── */
 .sp-event-card {
-	position: absolute;  /* positioned within wrapper using top% + height% */
+	position: absolute; /* positioned within wrapper using top% + height% */
 	left: 0;
 	right: 1px;
 	padding: 12px;
 	border-radius: 12px;
 	font-size: 0.75rem;
-	color: #000;
 	display: flex;
 	flex-direction: column;
 	align-items: flex-start;
@@ -199,13 +199,15 @@
 }
 .sp-event-info {
 	font-size: 0.7rem;
-	color: #333;
+	color: inherit;
+	opacity: 0.75;
 	text-align: left;
 }
 .sp-event-online {
 	font-size: 0.65rem;
 	font-style: italic;
-	color: #555;
+	color: inherit;
+	opacity: 0.75;
 }
 
 /* ── Capture mode: temporarily reveals print root for image export ────── */
