@@ -77,7 +77,7 @@ export function generateColourName(hex: string): string {
 	if (s < 0.08) {
 		if (l > 0.93) return "Near White";
 		if (l < 0.12) return "Near Black";
-		if (l > 0.60) return "Light Grey";
+		if (l > 0.6) return "Light Grey";
 		if (l > 0.38) return "Mid Grey";
 		return "Dark Grey";
 	}
@@ -85,18 +85,18 @@ export function generateColourName(hex: string): string {
 	// Lightness label
 	const lightness =
 		l > 0.93
-			? "Barely"      // a hair off white
-			: l > 0.80
+			? "Barely" // a hair off white
+			: l > 0.8
 				? "Very Light"
 				: l > 0.65
 					? "Bright"
-					: l > 0.50
+					: l > 0.5
 						? "Mid"
 						: l > 0.35
 							? "Deep"
-							: l > 0.10
+							: l > 0.1
 								? "Dark"
-								: "Barely";   // a hair off black
+								: "Barely"; // a hair off black
 
 	// Hue label — expanded set
 	const hue =
@@ -126,16 +126,16 @@ export function generateColourName(hex: string): string {
 
 	// Saturation modifier — five buckets from barely-there to screaming
 	const saturation =
-		s < 0.20
-			? "Washed"    // very desaturated, pastel-adjacent
-			: s < 0.40
-				? "Muted"   // clearly coloured but soft
-				: s < 0.60
-					? ""        // neutral / no modifier needed
+		s < 0.2
+			? "Washed" // very desaturated, pastel-adjacent
+			: s < 0.4
+				? "Muted" // clearly coloured but soft
+				: s < 0.6
+					? "" // neutral / no modifier needed
 					: s < 0.78
-						? "Rich"    // noticeably saturated
-						: s < 0.90
-							? "Vivid"   // punchy
+						? "Rich" // noticeably saturated
+						: s < 0.9
+							? "Vivid" // punchy
 							: "Aggressive"; // maximum saturation
 
 	const parts = [lightness, saturation, hue].filter(Boolean);
@@ -272,6 +272,12 @@ export function validateEvent(form: EventForm): FormErrors<EventForm> {
 	if (!form.end) e.end = "End time is required.";
 	if (form.start && form.end && form.start >= form.end)
 		e.end = "End time must be after start time.";
+	else if (
+		form.start &&
+		form.end &&
+		timeToMinutes(form.end) - timeToMinutes(form.start) < 30
+	)
+		e.end = "Entry must be at least 30 minutes long.";
 	if (!form.colour) e.colour = "Please select a colour.";
 	if (!DAYS.some((d) => form[d as Day])) e.monday = "Select at least one day.";
 	return e;
@@ -446,7 +452,7 @@ export async function downloadJPEG(schedule: Schedule): Promise<void> {
 
 	const canvas = await withVisiblePage((page) =>
 		html2canvas(page, {
-			scale: 3,                // 3× pixel density → ~2448×3168 px for letter
+			scale: 3, // 3× pixel density → ~2448×3168 px for letter
 			backgroundColor: "#ffffff",
 			useCORS: true,
 			logging: false,
