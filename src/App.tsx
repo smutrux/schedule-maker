@@ -223,8 +223,26 @@ function App() {
 		}
 		const event = buildEvent(eventForm);
 		if (!event || !schedule) return;
+
+		// Expand schedule bounds if the event falls outside them.
+		// Times are stored as HH:MM on the schedule and as UTC ISO strings on the event,
+		// so we compare using the HH:MM portion of the event's UTC time directly.
+		const evtStart = event.start.slice(11, 16); // "HH:MM"
+		const evtEnd = event.end.slice(11, 16);
+		const newStart =
+			evtStart < schedule.scheduleStart ? evtStart : schedule.scheduleStart;
+		const newEnd =
+			evtEnd > schedule.scheduleEnd ? evtEnd : schedule.scheduleEnd;
+
 		setSchedule((prev) =>
-			prev ? { ...prev, events: [...prev.events, event] } : prev,
+			prev
+				? {
+						...prev,
+						scheduleStart: newStart,
+						scheduleEnd: newEnd,
+						events: [...prev.events, event],
+					}
+				: prev,
 		);
 		setEventForm(EMPTY_EVENT);
 		setEventErrors({});
@@ -637,7 +655,10 @@ function App() {
 			{hasSchedule && showPreview && (
 				<div className="preview-scaler-outer">
 					<div className="preview-scaler-inner">
-						<SchedulePreview schedule={schedule} />
+						<SchedulePreview
+							key={`${schedule.scheduleStart}-${schedule.scheduleEnd}-${schedule.events.length}`}
+							schedule={schedule}
+						/>
 					</div>
 				</div>
 			)}

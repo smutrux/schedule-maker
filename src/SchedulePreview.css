@@ -94,7 +94,6 @@
 	min-height: 0;    /* allow shrink below content size */
 	font-size: 11px;
 	position: relative;
-	overflow: hidden;
 }
 
 /* ── Header cells ─────────────────────────────────────────────────────── */
