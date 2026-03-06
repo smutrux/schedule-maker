@@ -96,6 +96,7 @@ function App() {
 	const [prefsOpen, setPrefsOpen] = useState(false);
 	const [itemOpen, setItemOpen] = useState(false);
 	const [downloadOpen, setDownloadOpen] = useState(false);
+	const [removeOpen, setRemoveOpen] = useState(false);
 	const [showPreview, setShowPreview] = useState(() => {
 		try {
 			return localStorage.getItem("show_preview") === "true";
@@ -230,9 +231,11 @@ function App() {
 		setItemOpen(false);
 	}
 
-	function handleRemoveLast() {
+	function handleRemoveEvent(index: number) {
 		setSchedule((prev) =>
-			prev ? { ...prev, events: prev.events.slice(0, -1) } : prev,
+			prev
+				? { ...prev, events: prev.events.filter((_, i) => i !== index) }
+				: prev,
 		);
 	}
 
@@ -322,9 +325,9 @@ function App() {
 					/>
 					<Button
 						large
-						icon="remove_selection"
-						text="Remove Last Item"
-						onClick={handleRemoveLast}
+						icon="delete"
+						text="Remove Entry"
+						onClick={() => setRemoveOpen(true)}
 						disabled={!hasEvents}
 					/>
 					<Button
@@ -548,6 +551,58 @@ function App() {
 							disabled={!!downloading}
 						/>
 					</div>
+				</Modal>
+
+				{/* ── Remove entry modal ────────────────────────────────────── */}
+				<Modal
+					title="Remove Entry"
+					isOpen={removeOpen}
+					onClose={() => setRemoveOpen(false)}
+					width={560}
+				>
+					{schedule && schedule.events.length > 0 ? (
+						<ul className="remove-event-list">
+							{schedule.events.map((event, i) => {
+								const start = new Date(event.start);
+								const end = new Date(event.end);
+								const fmt = (d: Date) => {
+									const h = d.getUTCHours();
+									const m = String(d.getUTCMinutes()).padStart(2, "0");
+									if (schedule["24hr"]) return `${h}:${m}`;
+									const h12 = h % 12 || 12;
+									return `${h12}:${m} ${h >= 12 ? "PM" : "AM"}`;
+								};
+								const days = event.repeats
+									.map((d) => d.charAt(0).toUpperCase() + d.slice(1, 3))
+									.join(", ");
+								return (
+									<li key={i} className="remove-event-item">
+										<span
+											className="remove-event-swatch"
+											style={{ background: event.colour }}
+										/>
+										<div className="remove-event-info">
+											<span className="remove-event-name">{event.name}</span>
+											<span className="remove-event-meta">
+												{fmt(start)}–{fmt(end)} · {days}
+											</span>
+										</div>
+										<Button
+											icon="delete"
+											onClick={() => handleRemoveEvent(i)}
+											aria-label={`Remove ${event.name}`}
+										/>
+									</li>
+								);
+							})}
+						</ul>
+					) : (
+						<p
+							style={{ textAlign: "center", color: "var(--color-text-muted)" }}
+						>
+							No entries to remove.
+						</p>
+					)}
 				</Modal>
 
 				{/* Hidden file input for JSON import */}
