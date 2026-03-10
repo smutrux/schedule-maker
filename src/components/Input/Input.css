@@ -224,12 +224,102 @@
 	color: var(--color-text-disabled);
 }
 
-.input-time-native {
-	position: absolute;
-	opacity: 0;
-	width: 0;
-	height: 0;
-	pointer-events: none;
+/* Custom cross-browser time picker popover */
+.time-picker-popover {
+	position: fixed;
+	z-index: 9999;
+	background: var(--color-surface);
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-md);
+	box-shadow: var(--shadow-lg);
+	padding: 0.5rem;
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+}
+
+.time-picker-column {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	width: 3rem;
+	height: calc(5 * 36px); /* show 5 items */
+	overflow-y: auto;
+	scroll-snap-type: y mandatory;
+	scrollbar-width: none; /* Firefox */
+}
+
+.time-picker-column::-webkit-scrollbar {
+	display: none; /* Chrome/Safari */
+}
+
+.time-picker-item {
+	height: 36px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: 1rem;
+	font-family: inherit;
+	color: var(--color-text-muted);
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	scroll-snap-align: start;
+	transition:
+		background var(--transition-fast),
+		color var(--transition-fast);
+}
+
+.time-picker-item:hover {
+	background: var(--color-border);
+	color: var(--color-text);
+}
+
+.time-picker-item.selected {
+	background: var(--color-focus-ring);
+	color: var(--color-primary);
+	font-weight: 600;
+}
+
+.time-picker-colon {
+	font-size: 1.2rem;
+	font-weight: 600;
+	color: var(--color-text-muted);
+	padding-bottom: 0.1rem;
+	align-self: center;
+}
+
+.time-picker-ampm {
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+	margin-left: 0.25rem;
+}
+
+.time-picker-ampm-btn {
+	padding: 0.3rem 0.5rem;
+	font-size: 0.8rem;
+	font-family: inherit;
+	font-weight: 600;
+	border: 1.5px solid var(--color-border);
+	border-radius: var(--radius-sm);
+	background: transparent;
+	color: var(--color-text-muted);
+	cursor: pointer;
+	transition:
+		background var(--transition-fast),
+		color var(--transition-fast),
+		border-color var(--transition-fast);
+}
+
+.time-picker-ampm-btn:hover {
+	border-color: var(--color-border-hover);
+	color: var(--color-text);
+}
+
+.time-picker-ampm-btn.selected {
+	background: var(--color-focus-ring);
+	border-color: var(--color-primary);
+	color: var(--color-primary);
 }
 
 /* ── Checkbox disabled ───────────────────────────────────────────────── */

@@ -324,15 +324,33 @@ export function TimePicker({
 	const isControlled = controlledValue !== undefined;
 	const [internalValue, setInternalValue] = useState("");
 	const value = isControlled ? controlledValue! : internalValue;
-	const inputRef = useRef<HTMLInputElement>(null);
 
-	// Normalise whatever the browser gives us to "HH:MM" 24hr string
-	function normalise(raw: string): string {
-		if (!raw) return "";
-		// Already "HH:MM" from a standard time input — just return it
-		if (/^\d{1,2}:\d{2}$/.test(raw)) return raw.padStart(5, "0");
-		return raw;
+	const triggerRef = useRef<HTMLDivElement>(null);
+	const popoverRef = useRef<HTMLDivElement>(null);
+	const [open, setOpen] = useState(false);
+	const [popoverPos, setPopoverPos] = useState<{
+		top: number;
+		left: number;
+	} | null>(null);
+	const [popoverReady, setPopoverReady] = useState(false);
+	const [portalTarget, setPortalTarget] = useState<Element>(document.body);
+
+	// Parse "HH:MM" value into hour/minute integers, falling back to current time
+	function parseValue(v: string): { hour: number; minute: number } {
+		if (v && /^\d{1,2}:\d{2}$/.test(v)) {
+			const [h, m] = v.split(":");
+			return { hour: parseInt(h, 10), minute: parseInt(m, 10) };
+		}
+		const now = new Date();
+		return { hour: now.getHours(), minute: now.getMinutes() };
 	}
+
+	const { hour: selectedHour, minute: selectedMinute } = parseValue(value);
+
+	// Scroll refs for the hour and minute columns
+	const hourListRef = useRef<HTMLUListElement>(null);
+	const minuteListRef = useRef<HTMLUListElement>(null);
+	const ITEM_HEIGHT = 36; // px — must match CSS
 
 	function formatDisplay(v: string): string | null {
 		if (!v) return null;
@@ -345,11 +363,93 @@ export function TimePicker({
 		return `${String(display).padStart(2, "0")}:${m} ${suffix}`;
 	}
 
-	function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
-		const normalised = normalise(e.target.value);
-		if (!isControlled) setInternalValue(normalised);
-		onChange?.(normalised);
+	function commitChange(hour: number, minute: number) {
+		const v = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+		if (!isControlled) setInternalValue(v);
+		onChange?.(v);
 	}
+
+	function handleOpen() {
+		if (open) {
+			setOpen(false);
+			return;
+		}
+		const rect = triggerRef.current?.getBoundingClientRect();
+		if (rect) {
+			setPopoverPos({ top: rect.bottom + 8, left: rect.left });
+		}
+		setPopoverReady(false);
+		const dialog = triggerRef.current?.closest("dialog");
+		setPortalTarget(dialog ?? document.body);
+		setOpen(true);
+	}
+
+	// Clamp popover position after it mounts
+	useLayoutEffect(() => {
+		if (!open || !popoverRef.current || !triggerRef.current) return;
+		const pop = popoverRef.current.getBoundingClientRect();
+		const trigger = triggerRef.current.getBoundingClientRect();
+		const margin = 8;
+		const vw = window.innerWidth;
+		const vh = window.innerHeight;
+
+		let left = trigger.left;
+		let top = trigger.bottom + margin;
+
+		left = Math.max(margin, Math.min(left, vw - pop.width - margin));
+		if (top + pop.height > vh - margin) top = trigger.top - pop.height - margin;
+		top = Math.max(margin, top);
+
+		setPopoverPos({ top, left });
+		setPopoverReady(true);
+	}, [open]);
+
+	// Scroll selected items into the centre of each column when opening
+	useLayoutEffect(() => {
+		if (!open || !popoverReady) return;
+		const hours = is24hr ? 24 : 12;
+		const displayHour = is24hr
+			? selectedHour
+			: selectedHour % 12 === 0
+				? 12
+				: selectedHour % 12;
+		hourListRef.current?.scrollTo({
+			top: (displayHour % hours) * ITEM_HEIGHT,
+			behavior: "instant",
+		});
+		minuteListRef.current?.scrollTo({
+			top: selectedMinute * ITEM_HEIGHT,
+			behavior: "instant",
+		});
+	}, [open, popoverReady]);
+
+	// Close on outside click
+	useEffect(() => {
+		if (!open) return;
+		function handleClick(e: MouseEvent) {
+			if (
+				triggerRef.current?.contains(e.target as Node) ||
+				popoverRef.current?.contains(e.target as Node)
+			)
+				return;
+			setOpen(false);
+		}
+		document.addEventListener("mousedown", handleClick);
+		return () => document.removeEventListener("mousedown", handleClick);
+	}, [open]);
+
+	const hours = is24hr
+		? Array.from({ length: 24 }, (_, i) => i)
+		: Array.from({ length: 12 }, (_, i) => i + 1); // 1–12
+
+	const minutes = Array.from({ length: 60 }, (_, i) => i);
+
+	const displayHour = is24hr
+		? selectedHour
+		: selectedHour % 12 === 0
+			? 12
+			: selectedHour % 12;
+	const isPM = selectedHour >= 12;
 
 	const display = formatDisplay(value);
 	const placeholder = is24hr ? "08:00" : "08:00 a.m.";
@@ -357,21 +457,108 @@ export function TimePicker({
 	return (
 		<Field label={label} id={id}>
 			<div
+				ref={triggerRef}
+				id={id}
 				className="input-wrapper input-time-wrapper"
-				onClick={() => inputRef.current?.showPicker?.()}
+				onClick={handleOpen}
+				role="button"
+				tabIndex={0}
+				onKeyDown={(e) => {
+					if (e.key === "Enter" || e.key === " ") handleOpen();
+				}}
+				aria-haspopup="listbox"
+				aria-expanded={open}
 			>
 				<span className="input-time-display">
 					{display ?? <span className="input-placeholder">{placeholder}</span>}
 				</span>
-				<input
-					ref={inputRef}
-					id={id}
-					type="time"
-					value={value}
-					onChange={handleChange}
-					className="input-time-native"
-				/>
 			</div>
+
+			{open &&
+				popoverPos &&
+				createPortal(
+					<div
+						ref={popoverRef}
+						className="time-picker-popover"
+						style={{
+							top: popoverPos.top,
+							left: popoverPos.left,
+							visibility: popoverReady ? "visible" : "hidden",
+						}}
+						role="dialog"
+						aria-label="Select time"
+					>
+						{/* Hour column */}
+						<ul
+							ref={hourListRef}
+							className="time-picker-column"
+							role="listbox"
+							aria-label="Hours"
+						>
+							{hours.map((h) => (
+								<li
+									key={h}
+									role="option"
+									aria-selected={h === displayHour}
+									className={`time-picker-item${h === displayHour ? " selected" : ""}`}
+									onClick={() => {
+										const newHour = is24hr ? h : isPM ? (h % 12) + 12 : h % 12;
+										commitChange(newHour, selectedMinute);
+									}}
+								>
+									{String(h).padStart(2, "0")}
+								</li>
+							))}
+						</ul>
+
+						<span className="time-picker-colon">:</span>
+
+						{/* Minute column */}
+						<ul
+							ref={minuteListRef}
+							className="time-picker-column"
+							role="listbox"
+							aria-label="Minutes"
+						>
+							{minutes.map((m) => (
+								<li
+									key={m}
+									role="option"
+									aria-selected={m === selectedMinute}
+									className={`time-picker-item${m === selectedMinute ? " selected" : ""}`}
+									onClick={() => commitChange(selectedHour, m)}
+								>
+									{String(m).padStart(2, "0")}
+								</li>
+							))}
+						</ul>
+
+						{/* AM/PM toggle for 12h mode */}
+						{!is24hr && (
+							<div className="time-picker-ampm">
+								<button
+									className={`time-picker-ampm-btn${!isPM ? " selected" : ""}`}
+									onClick={() => {
+										const newHour = selectedHour % 12; // AM: 0–11
+										commitChange(newHour, selectedMinute);
+									}}
+								>
+									AM
+								</button>
+								<button
+									className={`time-picker-ampm-btn${isPM ? " selected" : ""}`}
+									onClick={() => {
+										const newHour = (selectedHour % 12) + 12; // PM: 12–23
+										commitChange(newHour, selectedMinute);
+									}}
+								>
+									PM
+								</button>
+							</div>
+						)}
+					</div>,
+					portalTarget,
+				)}
 		</Field>
 	);
 }
