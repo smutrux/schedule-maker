@@ -62,7 +62,7 @@
 
 /* ── Page wrapper ─────────────────────────────────────────────────────── */
 .sp-page {
-	/* Match physical letter size + 1in margins so screen preview = printed output */
+	/* Match physical letter size + 0.25in margins so screen preview = printed output */
 	width: 8.5in;
 	height: 11in;
 	padding: 0.25in;
@@ -74,6 +74,7 @@
 	color: #000;
 	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 	flex-shrink: 0;
+	margin: 0 auto;
 }
 
 /* ── Title ────────────────────────────────────────────────────────────── */

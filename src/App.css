@@ -127,16 +127,11 @@
  * .preview-scaler-inner  — scales the fixed 816px .sp-page down to fit.
  */
 .preview-scaler-outer {
-	width: 90vw;
-	height: calc(90vw * (11 / 8.5));
-	margin: 1rem auto 2rem;
+	margin: 2rem;
 }
 
 .preview-scaler-inner {
-	transform-origin: top left;
-	/* scale factor: 90vw / 816px (8.5in at 96 dpi) */
-	transform: scale(calc(90vw / 816px));
-	width: 816px;
+	overflow-x: scroll;
 }
 
 /* ── Import error modal ───────────────────────────────────────────────────── */
