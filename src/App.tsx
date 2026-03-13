@@ -14,11 +14,12 @@
  * State overview:
  *  schedule          — the current Schedule document (null when none started).
  *  prefsOpen         — controls the New / Edit Preferences modal.
- *  itemOpen          — controls the Add Item modal.
+ *  itemOpen          — controls the Add Item / Edit Item modal.
  *  downloadOpen      — controls the Download format picker modal.
  *  showPreview       — toggles between schedule summary and inline preview.
  *  downloading       — tracks which download ("pdf" | "jpeg") is in flight.
  *  isEditingExisting — distinguishes "New Schedule" from "Edit Preferences".
+ *  editingEventIndex — index of the event being edited, or null when adding.
  *  importError       — non-null string triggers the import error modal.
  */
 import "./App.css";
@@ -106,6 +107,9 @@ function App() {
 	});
 	const [downloading, setDownloading] = useState<"pdf" | "jpeg" | null>(null);
 	const [isEditingExisting, setIsEditingExisting] = useState(false);
+	const [editingEventIndex, setEditingEventIndex] = useState<number | null>(
+		null,
+	);
 	const [importError, setImportError] = useState<string | null>(null);
 	const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -214,8 +218,40 @@ function App() {
 
 	// ── Events ──────────────────────────────────────────────────────────
 	function openAddItem() {
+		setEditingEventIndex(null);
 		setEventForm(EMPTY_EVENT);
 		setEventErrors({});
+		setItemOpen(true);
+	}
+
+	/** Converts a saved ScheduleEvent back into the EventForm shape for editing. */
+	function eventToForm(event: Schedule["events"][number]): EventForm {
+		const start = new Date(event.start);
+		const end = new Date(event.end);
+		const pad = (n: number) => String(n).padStart(2, "0");
+		return {
+			name: event.name,
+			additionalInfo: event.additionalInfo ?? "",
+			start: `${pad(start.getUTCHours())}:${pad(start.getUTCMinutes())}`,
+			end: `${pad(end.getUTCHours())}:${pad(end.getUTCMinutes())}`,
+			colour: event.colour,
+			online: event.online ?? false,
+			monday: event.repeats.includes("monday"),
+			tuesday: event.repeats.includes("tuesday"),
+			wednesday: event.repeats.includes("wednesday"),
+			thursday: event.repeats.includes("thursday"),
+			friday: event.repeats.includes("friday"),
+			saturday: event.repeats.includes("saturday"),
+			sunday: event.repeats.includes("sunday"),
+		};
+	}
+
+	function openEditItem(index: number) {
+		if (!schedule) return;
+		setEditingEventIndex(index);
+		setEventForm(eventToForm(schedule.events[index]));
+		setEventErrors({});
+		setRemoveOpen(false);
 		setItemOpen(true);
 	}
 
@@ -233,26 +269,51 @@ function App() {
 		const event = buildEvent(eventForm);
 		if (!event || !schedule) return;
 
-		// Expand schedule bounds if the event falls outside them.
-		// Times are stored as HH:MM on the schedule and as UTC ISO strings on the event,
-		// so we compare using the HH:MM portion of the event's UTC time directly.
-		const evtStart = event.start.slice(11, 16); // "HH:MM"
+		const evtStart = event.start.slice(11, 16);
 		const evtEnd = event.end.slice(11, 16);
-		const newStart =
-			evtStart < schedule.scheduleStart ? evtStart : schedule.scheduleStart;
-		const newEnd =
-			evtEnd > schedule.scheduleEnd ? evtEnd : schedule.scheduleEnd;
 
-		setSchedule((prev) =>
-			prev
-				? {
-						...prev,
-						scheduleStart: newStart,
-						scheduleEnd: newEnd,
-						events: [...prev.events, event],
-					}
-				: prev,
-		);
+		if (editingEventIndex !== null) {
+			// Edit mode — replace the event at the stored index
+			setSchedule((prev) => {
+				if (!prev) return prev;
+				const events = prev.events.map((e, i) =>
+					i === editingEventIndex ? event : e,
+				);
+				// Recompute bounds across all events after the replacement
+				const allStarts = events.map((e) => e.start.slice(11, 16));
+				const allEnds = events.map((e) => e.end.slice(11, 16));
+				return {
+					...prev,
+					scheduleStart: allStarts.reduce(
+						(a, b) => (a < b ? a : b),
+						prev.scheduleStart,
+					),
+					scheduleEnd: allEnds.reduce(
+						(a, b) => (a > b ? a : b),
+						prev.scheduleEnd,
+					),
+					events,
+				};
+			});
+		} else {
+			// Add mode — append and expand bounds if needed
+			const newStart =
+				evtStart < schedule.scheduleStart ? evtStart : schedule.scheduleStart;
+			const newEnd =
+				evtEnd > schedule.scheduleEnd ? evtEnd : schedule.scheduleEnd;
+			setSchedule((prev) =>
+				prev
+					? {
+							...prev,
+							scheduleStart: newStart,
+							scheduleEnd: newEnd,
+							events: [...prev.events, event],
+						}
+					: prev,
+			);
+		}
+
+		setEditingEventIndex(null);
 		setEventForm(EMPTY_EVENT);
 		setEventErrors({});
 		setItemOpen(false);
@@ -346,14 +407,14 @@ function App() {
 					<Button
 						large
 						icon="edit_square"
-						text="Edit Preferences"
+						text="Edit Schedule"
 						onClick={openEditPreferences}
 						disabled={!hasSchedule}
 					/>
 					<Button
 						large
-						icon="delete"
-						text="Remove Entry"
+						icon="dashboard_2_edit"
+						text="Edit Entries"
 						onClick={() => setRemoveOpen(true)}
 						disabled={!hasEvents}
 					/>
@@ -458,9 +519,11 @@ function App() {
 					</div>
 				</Modal>
 
-				{/* ── Add item modal ─────────────────────────────────────────── */}
+				{/* ── Add / Edit item modal ──────────────────────────────────── */}
 				<Modal
-					title="Add Item to Schedule"
+					title={
+						editingEventIndex !== null ? "Edit Item" : "Add Item to Schedule"
+					}
 					isOpen={itemOpen}
 					onClose={() => setItemOpen(false)}
 					width={640}
@@ -537,7 +600,11 @@ function App() {
 
 						<div className="modal-row-break" />
 						<div className="modal-action-row">
-							<Button text="Add Item" icon="add_ad" onClick={handleAddEvent} />
+							<Button
+								text={editingEventIndex !== null ? "Save Changes" : "Add Item"}
+								icon={editingEventIndex !== null ? "save" : "add_ad"}
+								onClick={handleAddEvent}
+							/>
 						</div>
 					</div>
 				</Modal>
@@ -580,9 +647,9 @@ function App() {
 					</div>
 				</Modal>
 
-				{/* ── Remove entry modal ────────────────────────────────────── */}
+				{/* ── Edit / Remove entry modal ─────────────────────────── */}
 				<Modal
-					title="Remove Entry"
+					title="Edit / Remove Entry"
 					isOpen={removeOpen}
 					onClose={() => setRemoveOpen(false)}
 					width={560}
@@ -614,11 +681,18 @@ function App() {
 												{fmt(start)}–{fmt(end)} · {days}
 											</span>
 										</div>
-										<Button
-											icon="delete"
-											onClick={() => handleRemoveEvent(i)}
-											aria-label={`Remove ${event.name}`}
-										/>
+										<div className="remove-event-actions">
+											<Button
+												icon="edit"
+												onClick={() => openEditItem(i)}
+												aria-label={`Edit ${event.name}`}
+											/>
+											<Button
+												icon="delete"
+												onClick={() => handleRemoveEvent(i)}
+												aria-label={`Remove ${event.name}`}
+											/>
+										</div>
 									</li>
 								);
 							})}
@@ -665,7 +739,7 @@ function App() {
 				<div className="preview-scaler-outer">
 					<div className="preview-scaler-inner">
 						<SchedulePreview
-							key={`${schedule.scheduleStart}-${schedule.scheduleEnd}-${schedule.events.length}`}
+							key={`${schedule.scheduleStart}-${schedule.scheduleEnd}-${schedule.events.map((e) => e.start + e.end + e.name + e.colour + e.repeats.join()).join("|")}`}
 							schedule={schedule}
 						/>
 					</div>

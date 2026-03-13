@@ -131,7 +131,7 @@
 }
 
 .preview-scaler-inner {
-	overflow-x: scroll;
+	overflow-x: auto;
 }
 
 /* ── Import error modal ───────────────────────────────────────────────────── */
@@ -176,6 +176,12 @@
 	border: 1.5px solid var(--color-border);
 	border-radius: var(--radius-md);
 	background: var(--color-surface);
+}
+
+.remove-event-actions {
+	display: flex;
+	gap: 0.4rem;
+	flex-shrink: 0;
 }
 
 .remove-event-swatch {
