@@ -58,10 +58,10 @@ export function TextInput({
 	label,
 	...props
 }: TextInputProps) {
-	const id = useId();
-	const isControlled = controlledValue !== undefined;
-	const [internalValue, setInternalValue] = useState("");
-	const value = isControlled ? controlledValue : internalValue;
+	let id = useId();
+	let isControlled = controlledValue !== undefined;
+	let [internalValue, setInternalValue] = useState("");
+	let value = isControlled ? controlledValue : internalValue;
 
 	return (
 		<Field label={label} id={id}>
@@ -90,9 +90,9 @@ export function Checkbox({
 	label,
 	disabled = false,
 }: CheckboxProps) {
-	const isControlled = controlledChecked !== undefined;
-	const [internalChecked, setInternalChecked] = useState(false);
-	const checked = isControlled ? controlledChecked : internalChecked;
+	let isControlled = controlledChecked !== undefined;
+	let [internalChecked, setInternalChecked] = useState(false);
+	let checked = isControlled ? controlledChecked : internalChecked;
 
 	function handleClick() {
 		if (!isControlled) setInternalChecked((v) => !v);
@@ -132,19 +132,19 @@ export function ColourPicker({
 	onChange,
 	label,
 }: ColourPickerProps) {
-	const id = useId();
-	const [open, setOpen] = useState(false);
-	const isControlled = controlledValue !== undefined;
-	const [internalValue, setInternalValue] = useState("#6b93c4");
-	const value = isControlled ? controlledValue! : internalValue;
-	const swatchRef = useRef<HTMLDivElement>(null);
-	const popoverRef = useRef<HTMLDivElement>(null);
-	const [popoverPos, setPopoverPos] = useState<{
+	let id = useId();
+	let [open, setOpen] = useState(false);
+	let isControlled = controlledValue !== undefined;
+	let [internalValue, setInternalValue] = useState("#6b93c4");
+	let value = isControlled ? controlledValue! : internalValue;
+	let swatchRef = useRef<HTMLDivElement>(null);
+	let popoverRef = useRef<HTMLDivElement>(null);
+	let [popoverPos, setPopoverPos] = useState<{
 		top: number;
 		left: number;
 	} | null>(null);
-	const [popoverReady, setPopoverReady] = useState(false);
-	const [portalTarget, setPortalTarget] = useState<Element>(document.body);
+	let [popoverReady, setPopoverReady] = useState(false);
+	let [portalTarget, setPortalTarget] = useState<Element>(document.body);
 
 	function handleChange(hex: string) {
 		if (!isControlled) setInternalValue(hex);
@@ -157,7 +157,7 @@ export function ColourPicker({
 			return;
 		}
 		// Store the trigger rect so the layout effect can compute position after mount
-		const rect = swatchRef.current?.getBoundingClientRect();
+		let rect = swatchRef.current?.getBoundingClientRect();
 		if (rect) {
 			// Tentatively centre below the swatch; clamped after mount in the effect
 			setPopoverPos({
@@ -167,7 +167,7 @@ export function ColourPicker({
 		}
 		setPopoverReady(false);
 		// Portal into the dialog if inside one, otherwise body
-		const dialog = swatchRef.current?.closest("dialog");
+		let dialog = swatchRef.current?.closest("dialog");
 		setPortalTarget(dialog ?? document.body);
 		setOpen(true);
 	}
@@ -175,11 +175,11 @@ export function ColourPicker({
 	// After the popover mounts, measure it and clamp so it never escapes the viewport
 	useLayoutEffect(() => {
 		if (!open || !popoverRef.current || !swatchRef.current) return;
-		const pop = popoverRef.current.getBoundingClientRect();
-		const swatch = swatchRef.current.getBoundingClientRect();
-		const margin = 8;
-		const vw = window.innerWidth;
-		const vh = window.innerHeight;
+		let pop = popoverRef.current.getBoundingClientRect();
+		let swatch = swatchRef.current.getBoundingClientRect();
+		let margin = 8;
+		let vw = window.innerWidth;
+		let vh = window.innerHeight;
 
 		let left = swatch.left + swatch.width / 2 - pop.width / 2;
 		let top = swatch.bottom + margin;
@@ -263,17 +263,17 @@ export function Dropdown({
 	placeholder = "Choose an option",
 	label,
 }: DropdownProps) {
-	const id = useId();
-	const isControlled = controlledValue !== undefined;
-	const [internalValue, setInternalValue] = useState("");
-	const value = isControlled ? controlledValue! : internalValue;
+	let id = useId();
+	let isControlled = controlledValue !== undefined;
+	let [internalValue, setInternalValue] = useState("");
+	let value = isControlled ? controlledValue! : internalValue;
 
 	function handleChange(e: React.ChangeEvent<HTMLSelectElement>) {
 		if (!isControlled) setInternalValue(e.target.value);
 		onChange?.(e.target.value);
 	}
 
-	const isHex = /^#[0-9a-fA-F]{6}$/.test(value);
+	let isHex = /^#[0-9a-fA-F]{6}$/.test(value);
 
 	return (
 		<Field label={label} id={id}>
@@ -328,51 +328,51 @@ export function TimePicker({
 	label,
 	is24hr = false,
 }: TimePickerProps) {
-	const id = useId();
-	const isControlled = controlledValue !== undefined;
-	const [internalValue, setInternalValue] = useState("");
-	const value = isControlled ? controlledValue! : internalValue;
+	let id = useId();
+	let isControlled = controlledValue !== undefined;
+	let [internalValue, setInternalValue] = useState("");
+	let value = isControlled ? controlledValue! : internalValue;
 
-	const triggerRef = useRef<HTMLDivElement>(null);
-	const popoverRef = useRef<HTMLDivElement>(null);
-	const [open, setOpen] = useState(false);
-	const [popoverPos, setPopoverPos] = useState<{
+	let triggerRef = useRef<HTMLDivElement>(null);
+	let popoverRef = useRef<HTMLDivElement>(null);
+	let [open, setOpen] = useState(false);
+	let [popoverPos, setPopoverPos] = useState<{
 		top: number;
 		left: number;
 	} | null>(null);
-	const [popoverReady, setPopoverReady] = useState(false);
-	const [portalTarget, setPortalTarget] = useState<Element>(document.body);
+	let [popoverReady, setPopoverReady] = useState(false);
+	let [portalTarget, setPortalTarget] = useState<Element>(document.body);
 
 	// Parse "HH:MM" value into hour/minute integers, falling back to current time
 	function parseValue(v: string): { hour: number; minute: number } {
 		if (v && /^\d{1,2}:\d{2}$/.test(v)) {
-			const [h, m] = v.split(":");
+			let [h, m] = v.split(":");
 			return { hour: parseInt(h, 10), minute: parseInt(m, 10) };
 		}
-		const now = new Date();
+		let now = new Date();
 		return { hour: now.getHours(), minute: now.getMinutes() };
 	}
 
-	const { hour: selectedHour, minute: selectedMinute } = parseValue(value);
+	let { hour: selectedHour, minute: selectedMinute } = parseValue(value);
 
 	// Scroll refs for the hour and minute columns
-	const hourListRef = useRef<HTMLUListElement>(null);
-	const minuteListRef = useRef<HTMLUListElement>(null);
-	const ITEM_HEIGHT = 36; // px — must match CSS
+	let hourListRef = useRef<HTMLUListElement>(null);
+	let minuteListRef = useRef<HTMLUListElement>(null);
+	let ITEM_HEIGHT = 36; // px — must match CSS
 
 	function formatDisplay(v: string): string | null {
 		if (!v) return null;
-		const [h, m] = v.split(":");
-		const hour = parseInt(h, 10);
+		let [h, m] = v.split(":");
+		let hour = parseInt(h, 10);
 		if (isNaN(hour)) return null;
 		if (is24hr) return `${String(hour).padStart(2, "0")}:${m}`;
-		const suffix = hour >= 12 ? "p.m." : "a.m.";
-		const display = hour % 12 === 0 ? 12 : hour % 12;
+		let suffix = hour >= 12 ? "p.m." : "a.m.";
+		let display = hour % 12 === 0 ? 12 : hour % 12;
 		return `${String(display).padStart(2, "0")}:${m} ${suffix}`;
 	}
 
 	function commitChange(hour: number, minute: number) {
-		const v = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+		let v = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
 		if (!isControlled) setInternalValue(v);
 		onChange?.(v);
 	}
@@ -382,12 +382,12 @@ export function TimePicker({
 			setOpen(false);
 			return;
 		}
-		const rect = triggerRef.current?.getBoundingClientRect();
+		let rect = triggerRef.current?.getBoundingClientRect();
 		if (rect) {
 			setPopoverPos({ top: rect.bottom + 8, left: rect.left });
 		}
 		setPopoverReady(false);
-		const dialog = triggerRef.current?.closest("dialog");
+		let dialog = triggerRef.current?.closest("dialog");
 		setPortalTarget(dialog ?? document.body);
 		setOpen(true);
 	}
@@ -395,11 +395,11 @@ export function TimePicker({
 	// Clamp popover position after it mounts
 	useLayoutEffect(() => {
 		if (!open || !popoverRef.current || !triggerRef.current) return;
-		const pop = popoverRef.current.getBoundingClientRect();
-		const trigger = triggerRef.current.getBoundingClientRect();
-		const margin = 8;
-		const vw = window.innerWidth;
-		const vh = window.innerHeight;
+		let pop = popoverRef.current.getBoundingClientRect();
+		let trigger = triggerRef.current.getBoundingClientRect();
+		let margin = 8;
+		let vw = window.innerWidth;
+		let vh = window.innerHeight;
 
 		let left = trigger.left;
 		let top = trigger.bottom + margin;
@@ -415,8 +415,8 @@ export function TimePicker({
 	// Scroll selected items into the centre of each column when opening
 	useLayoutEffect(() => {
 		if (!open || !popoverReady) return;
-		const hours = is24hr ? 24 : 12;
-		const displayHour = is24hr
+		let hours = is24hr ? 24 : 12;
+		let displayHour = is24hr
 			? selectedHour
 			: selectedHour % 12 === 0
 				? 12
@@ -446,21 +446,21 @@ export function TimePicker({
 		return () => document.removeEventListener("mousedown", handleClick);
 	}, [open]);
 
-	const hours = is24hr
+	let hours = is24hr
 		? Array.from({ length: 24 }, (_, i) => i)
 		: Array.from({ length: 12 }, (_, i) => i + 1); // 1–12
 
-	const minutes = Array.from({ length: 60 }, (_, i) => i);
+	let minutes = Array.from({ length: 60 }, (_, i) => i);
 
-	const displayHour = is24hr
+	let displayHour = is24hr
 		? selectedHour
 		: selectedHour % 12 === 0
 			? 12
 			: selectedHour % 12;
-	const isPM = selectedHour >= 12;
+	let isPM = selectedHour >= 12;
 
-	const display = formatDisplay(value);
-	const placeholder = is24hr ? "08:00" : "08:00 a.m.";
+	let display = formatDisplay(value);
+	let placeholder = is24hr ? "08:00" : "08:00 a.m.";
 
 	return (
 		<Field label={label} id={id}>
@@ -510,7 +510,7 @@ export function TimePicker({
 									aria-selected={h === displayHour}
 									className={`time-picker-item${h === displayHour ? " selected" : ""}`}
 									onClick={() => {
-										const newHour = is24hr ? h : isPM ? (h % 12) + 12 : h % 12;
+										let newHour = is24hr ? h : isPM ? (h % 12) + 12 : h % 12;
 										commitChange(newHour, selectedMinute);
 									}}
 								>
@@ -547,7 +547,7 @@ export function TimePicker({
 								<button
 									className={`time-picker-ampm-btn${!isPM ? " selected" : ""}`}
 									onClick={() => {
-										const newHour = selectedHour % 12; // AM: 0–11
+										let newHour = selectedHour % 12; // AM: 0–11
 										commitChange(newHour, selectedMinute);
 									}}
 								>
@@ -556,7 +556,7 @@ export function TimePicker({
 								<button
 									className={`time-picker-ampm-btn${isPM ? " selected" : ""}`}
 									onClick={() => {
-										const newHour = (selectedHour % 12) + 12; // PM: 12–23
+										let newHour = (selectedHour % 12) + 12; // PM: 12–23
 										commitChange(newHour, selectedMinute);
 									}}
 								>

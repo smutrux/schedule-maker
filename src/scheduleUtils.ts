@@ -24,7 +24,7 @@ import type {
 // ── Colour utilities ──────────────────────────────────────────────────────────
 
 function hexToRgb(hex: string) {
-	const n = parseInt(hex.slice(1), 16);
+	let n = parseInt(hex.slice(1), 16);
 	return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
 }
 
@@ -36,7 +36,7 @@ function colorDistance(
 }
 
 function isNearDuplicate(hex: string, colours: ColourEntry[], threshold = 30) {
-	const target = hexToRgb(hex);
+	let target = hexToRgb(hex);
 	return colours.some(
 		(c) => colorDistance(target, hexToRgb(c.colour)) < threshold,
 	);
@@ -46,13 +46,13 @@ function rgbToHsl({ r, g, b }: ReturnType<typeof hexToRgb>) {
 	r /= 255;
 	g /= 255;
 	b /= 255;
-	const max = Math.max(r, g, b);
-	const min = Math.min(r, g, b);
+	let max = Math.max(r, g, b);
+	let min = Math.min(r, g, b);
 	let h = 0,
 		s = 0;
-	const l = (max + min) / 2;
+	let l = (max + min) / 2;
 	if (max !== min) {
-		const d = max - min;
+		let d = max - min;
 		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
 		switch (max) {
 			case r:
@@ -71,7 +71,7 @@ function rgbToHsl({ r, g, b }: ReturnType<typeof hexToRgb>) {
 }
 
 export function generateColourName(hex: string): string {
-	const { h, s, l } = rgbToHsl(hexToRgb(hex));
+	let { h, s, l } = rgbToHsl(hexToRgb(hex));
 
 	// Near-neutral: very low saturation
 	if (s < 0.08) {
@@ -83,7 +83,7 @@ export function generateColourName(hex: string): string {
 	}
 
 	// Lightness label
-	const lightness =
+	let lightness =
 		l > 0.93
 			? "Barely" // a hair off white
 			: l > 0.8
@@ -99,7 +99,7 @@ export function generateColourName(hex: string): string {
 								: "Barely"; // a hair off black
 
 	// Hue label — expanded set
-	const hue =
+	let hue =
 		h < 12 || h >= 348
 			? "Red"
 			: h < 38
@@ -125,7 +125,7 @@ export function generateColourName(hex: string): string {
 													: "Rose";
 
 	// Saturation modifier — five buckets from barely-there to screaming
-	const saturation =
+	let saturation =
 		s < 0.2
 			? "Washed" // very desaturated, pastel-adjacent
 			: s < 0.4
@@ -138,7 +138,7 @@ export function generateColourName(hex: string): string {
 							? "Vivid" // punchy
 							: "Aggressive"; // maximum saturation
 
-	const parts = [lightness, saturation, hue].filter(Boolean);
+	let parts = [lightness, saturation, hue].filter(Boolean);
 	return parts.join(" ");
 }
 
@@ -148,21 +148,21 @@ export async function enrichCustomColourName(
 	schedule: Schedule,
 ): Promise<Schedule> {
 	// Find the last colour — the custom one just added, if any
-	const last = schedule.colours[schedule.colours.length - 1];
+	let last = schedule.colours[schedule.colours.length - 1];
 	// Only fetch for colours not in the original DEFAULT_COLOURS set
-	const isDefault = DEFAULT_COLOURS.some((c) => c.colour === last?.colour);
+	let isDefault = DEFAULT_COLOURS.some((c) => c.colour === last?.colour);
 	if (!last || isDefault) return schedule;
 
 	try {
-		const hex = last.colour.replace("#", "");
-		const res = await fetch(`https://www.thecolorapi.com/id?hex=${hex}`);
+		let hex = last.colour.replace("#", "");
+		let res = await fetch(`https://www.thecolorapi.com/id?hex=${hex}`);
 		if (!res.ok) return schedule;
-		const data = await res.json();
-		const apiName: string = data?.name?.value;
+		let data = await res.json();
+		let apiName: string = data?.name?.value;
 		if (!apiName) return schedule;
 
 		// Patch just that colour entry's name
-		const updatedColours = schedule.colours.map((c) =>
+		let updatedColours = schedule.colours.map((c) =>
 			c.colour === last.colour ? { ...c, name: apiName } : c,
 		);
 		return { ...schedule, colours: updatedColours };
@@ -174,7 +174,7 @@ export async function enrichCustomColourName(
 
 // ── Default colours ───────────────────────────────────────────────────────────
 
-export const DEFAULT_COLOURS: ColourEntry[] = [
+export let DEFAULT_COLOURS: ColourEntry[] = [
 	{ name: "Quiet Violet", colour: "#BCBEF1" },
 	{ name: "Smooth Blue", colour: "#B7CFFF" },
 	{ name: "Serene Green", colour: "#ADEB97" },
@@ -190,8 +190,8 @@ export function buildSchedule(
 	existingColours: ColourEntry[],
 	existingEvents: Schedule["events"] = [],
 ): Schedule {
-	const colours = [...existingColours];
-	const customHex = form.customColour.toUpperCase();
+	let colours = [...existingColours];
+	let customHex = form.customColour.toUpperCase();
 	if (
 		/^#[0-9A-F]{6}$/.test(customHex) &&
 		!colours.some((c) => c.colour === customHex) &&
@@ -212,7 +212,7 @@ export function buildSchedule(
 
 // ── Build event ───────────────────────────────────────────────────────────────
 
-const DAYS = [
+let DAYS = [
 	"monday",
 	"tuesday",
 	"wednesday",
@@ -224,11 +224,11 @@ const DAYS = [
 type Day = (typeof DAYS)[number];
 
 export function buildEvent(form: EventForm): ScheduleEvent | null {
-	const name = form.name.trim();
+	let name = form.name.trim();
 	if (!name || !form.start || !form.end) return null;
-	const repeats = DAYS.filter((d) => form[d as Day]);
+	let repeats = DAYS.filter((d) => form[d as Day]);
 	if (repeats.length === 0) return null;
-	const toISO = (t: string) => `2023-06-27T${t}:00.000Z`;
+	let toISO = (t: string) => `2023-06-27T${t}:00.000Z`;
 	return {
 		name,
 		start: toISO(form.start),
@@ -245,14 +245,14 @@ export function buildEvent(form: EventForm): ScheduleEvent | null {
 export type FormErrors<T> = Partial<Record<keyof T, string>>;
 
 function timeToMinutes(hhmm: string): number {
-	const [h, m] = hhmm.split(":").map(Number);
+	let [h, m] = hhmm.split(":").map(Number);
 	return h * 60 + m;
 }
 
 export function validatePreferences(
 	form: PreferencesForm,
 ): FormErrors<PreferencesForm> {
-	const e: FormErrors<PreferencesForm> = {};
+	let e: FormErrors<PreferencesForm> = {};
 	if (!form.name.trim()) e.name = "Schedule name is required.";
 	if (!form.scheduleStart) e.scheduleStart = "Start time is required.";
 	if (!form.scheduleEnd) e.scheduleEnd = "End time is required.";
@@ -266,7 +266,7 @@ export function validatePreferences(
 }
 
 export function validateEvent(form: EventForm): FormErrors<EventForm> {
-	const e: FormErrors<EventForm> = {};
+	let e: FormErrors<EventForm> = {};
 	if (!form.name.trim()) e.name = "Event name is required.";
 	if (!form.start) e.start = "Start time is required.";
 	if (!form.end) e.end = "End time is required.";
@@ -294,7 +294,7 @@ export function validateImport(raw: unknown): ImportResult {
 		return { ok: false, error: "File is not a valid JSON object." };
 	}
 
-	const obj = raw as Record<string, unknown>;
+	let obj = raw as Record<string, unknown>;
 
 	if (typeof obj.name !== "string" || !obj.name.trim()) {
 		return { ok: false, error: 'Missing or empty required field: "name".' };
@@ -318,7 +318,7 @@ export function validateImport(raw: unknown): ImportResult {
 
 	// Ensure every colour entry has name + colour string
 	for (let i = 0; i < obj.colours.length; i++) {
-		const c = obj.colours[i];
+		let c = obj.colours[i];
 		if (
 			!c ||
 			typeof c !== "object" ||
@@ -333,7 +333,7 @@ export function validateImport(raw: unknown): ImportResult {
 	}
 
 	// events is optional but must be an array if present
-	const events = Array.isArray(obj.events) ? obj.events : [];
+	let events = Array.isArray(obj.events) ? obj.events : [];
 
 	return {
 		ok: true,
@@ -354,7 +354,7 @@ export function validateImport(raw: unknown): ImportResult {
 
 // ── localStorage ──────────────────────────────────────────────────────────────
 
-const STORAGE_KEY = "pretty_schedule";
+let STORAGE_KEY = "pretty_schedule";
 
 export function saveSchedule(schedule: Schedule): void {
 	try {
@@ -366,9 +366,9 @@ export function saveSchedule(schedule: Schedule): void {
 
 export function loadSchedule(): Schedule | null {
 	try {
-		const raw = localStorage.getItem(STORAGE_KEY);
+		let raw = localStorage.getItem(STORAGE_KEY);
 		if (!raw) return null;
-		const parsed = JSON.parse(raw) as Schedule;
+		let parsed = JSON.parse(raw) as Schedule;
 		if (!parsed.name || !parsed.events || !parsed.colours) return null;
 		return parsed;
 	} catch (e) {
@@ -384,11 +384,11 @@ export function clearSchedule(): void {
 // ── Download: JSON ────────────────────────────────────────────────────────────
 
 export function downloadJSON(schedule: Schedule): void {
-	const blob = new Blob([JSON.stringify(schedule, null, 2)], {
+	let blob = new Blob([JSON.stringify(schedule, null, 2)], {
 		type: "application/json",
 	});
-	const url = URL.createObjectURL(blob);
-	const a = document.createElement("a");
+	let url = URL.createObjectURL(blob);
+	let a = document.createElement("a");
 	a.href = url;
 	a.download = `${schedule.name.replace(/\s+/g, "_")}.json`;
 	a.click();
@@ -402,9 +402,9 @@ export function downloadJSON(schedule: Schedule): void {
 async function withVisiblePage<T>(
 	capture: (el: HTMLElement) => Promise<T>,
 ): Promise<T> {
-	const root = document.querySelector(".sp-print-root") as HTMLElement | null;
+	let root = document.querySelector(".sp-print-root") as HTMLElement | null;
 	if (!root) throw new Error("Schedule print root not found.");
-	const page = root.querySelector(".sp-page") as HTMLElement | null;
+	let page = root.querySelector(".sp-page") as HTMLElement | null;
 	if (!page) throw new Error("Schedule page element not found.");
 
 	root.classList.add("sp-capturing");
@@ -422,12 +422,12 @@ async function withVisiblePage<T>(
 // ── Download: PDF ─────────────────────────────────────────────────────────────
 
 export async function downloadPDF(schedule: Schedule): Promise<void> {
-	const [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
+	let [{ default: html2canvas }, { default: jsPDF }] = await Promise.all([
 		import("html2canvas"),
 		import("jspdf"),
 	]);
 
-	const canvas = await withVisiblePage((page) =>
+	let canvas = await withVisiblePage((page) =>
 		html2canvas(page, {
 			scale: 2,
 			backgroundColor: "#ffffff",
@@ -436,7 +436,7 @@ export async function downloadPDF(schedule: Schedule): Promise<void> {
 		}),
 	);
 
-	const pdf = new jsPDF({
+	let pdf = new jsPDF({
 		orientation: "portrait",
 		unit: "pt",
 		format: "letter",
@@ -448,9 +448,9 @@ export async function downloadPDF(schedule: Schedule): Promise<void> {
 // ── Download: JPEG ────────────────────────────────────────────────────────────
 
 export async function downloadJPEG(schedule: Schedule): Promise<void> {
-	const { default: html2canvas } = await import("html2canvas");
+	let { default: html2canvas } = await import("html2canvas");
 
-	const canvas = await withVisiblePage((page) =>
+	let canvas = await withVisiblePage((page) =>
 		html2canvas(page, {
 			scale: 3, // 3× pixel density → ~2448×3168 px for letter
 			backgroundColor: "#ffffff",
@@ -460,9 +460,9 @@ export async function downloadJPEG(schedule: Schedule): Promise<void> {
 	);
 
 	// Convert to high-quality JPEG data URL
-	const dataUrl = canvas.toDataURL("image/jpeg", 0.95);
+	let dataUrl = canvas.toDataURL("image/jpeg", 0.95);
 
-	const a = document.createElement("a");
+	let a = document.createElement("a");
 	a.href = dataUrl;
 	a.download = `${schedule.name.replace(/\s+/g, "_")}.jpg`;
 	a.click();

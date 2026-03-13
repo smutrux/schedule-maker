@@ -39,61 +39,59 @@ const DAYS_ORDER = [
 ];
 
 function getMinutes(timeStr: string) {
-	const [h, m] = timeStr.split(":").map(Number);
+	let [h, m] = timeStr.split(":").map(Number);
 	return h * 60 + m;
 }
 
 function formatTime(isoString: string, is24hr: boolean) {
-	const d = new Date(isoString);
-	const h = d.getUTCHours();
-	const m = d.getUTCMinutes();
-	const displayH = is24hr ? h : h % 12 || 12;
-	const displayM = String(m).padStart(2, "0");
+	let d = new Date(isoString);
+	let h = d.getUTCHours();
+	let m = d.getUTCMinutes();
+	let displayH = is24hr ? h : h % 12 || 12;
+	let displayM = String(m).padStart(2, "0");
 	return `${displayH}:${displayM}`;
 }
 
 // Returns "#000" or "#fff" depending on which has better contrast against the
 // given hex background, using the WCAG relative luminance formula.
 function readableTextColour(hex: string): "#000000" | "#ffffff" {
-	const n = parseInt(hex.replace("#", ""), 16);
-	const toLinear = (c: number) => {
-		const s = c / 255;
+	let n = parseInt(hex.replace("#", ""), 16);
+	let toLinear = (c: number) => {
+		let s = c / 255;
 		return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
 	};
-	const r = toLinear((n >> 16) & 255);
-	const g = toLinear((n >> 8) & 255);
-	const b = toLinear(n & 255);
-	const L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+	let r = toLinear((n >> 16) & 255);
+	let g = toLinear((n >> 8) & 255);
+	let b = toLinear(n & 255);
+	let L = 0.2126 * r + 0.7152 * g + 0.0722 * b;
 	return L > 0.179 ? "#000000" : "#ffffff";
 }
 
 // ── Shared grid builder (used by both preview and print) ──────────────────────
 
 function ScheduleGrid({ schedule }: Props) {
-	const startMin = getMinutes(schedule.scheduleStart);
-	const endMin = getMinutes(schedule.scheduleEnd);
-	const totalSlots = (endMin - startMin) / 30;
+	let startMin = getMinutes(schedule.scheduleStart);
+	let endMin = getMinutes(schedule.scheduleEnd);
+	let totalSlots = (endMin - startMin) / 30;
 
 	let activeDays = ["monday", "tuesday", "wednesday", "thursday", "friday"];
-	const hasSaturday = schedule.events.some((e) =>
-		e.repeats.includes("saturday"),
-	);
-	const hasSunday = schedule.events.some((e) => e.repeats.includes("sunday"));
+	let hasSaturday = schedule.events.some((e) => e.repeats.includes("saturday"));
+	let hasSunday = schedule.events.some((e) => e.repeats.includes("sunday"));
 	if (hasSaturday) activeDays.push("saturday");
 	if (hasSunday) activeDays.unshift("sunday");
 	activeDays.sort((a, b) => DAYS_ORDER.indexOf(a) - DAYS_ORDER.indexOf(b));
 
-	const gridTemplateColumns = `60px repeat(${activeDays.length}, 1fr)`;
-	const gridTemplateRows = `40px repeat(${totalSlots}, minmax(0, 1fr))`;
+	let gridTemplateColumns = `60px repeat(${activeDays.length}, 1fr)`;
+	let gridTemplateRows = `40px repeat(${totalSlots}, minmax(0, 1fr))`;
 
-	const timeSlots = Array.from({ length: totalSlots }, (_, i) => {
-		const currentMin = startMin + i * 30;
-		const hour = Math.floor(currentMin / 60);
-		const min = currentMin % 60;
-		const isHour = min === 0;
-		const displayH = schedule["24hr"] ? hour : hour % 12 || 12;
-		const displayM = min === 0 ? "00" : String(min);
-		const ampm = schedule["24hr"] ? "" : hour >= 12 ? " PM" : " AM";
+	let timeSlots = Array.from({ length: totalSlots }, (_, i) => {
+		let currentMin = startMin + i * 30;
+		let hour = Math.floor(currentMin / 60);
+		let min = currentMin % 60;
+		let isHour = min === 0;
+		let displayH = schedule["24hr"] ? hour : hour % 12 || 12;
+		let displayM = min === 0 ? "00" : String(min);
+		let ampm = schedule["24hr"] ? "" : hour >= 12 ? " PM" : " AM";
 		return { i, isHour, label: `${displayH}:${displayM}${ampm}` };
 	});
 
@@ -117,8 +115,8 @@ function ScheduleGrid({ schedule }: Props) {
 
 				{/* Time + background cells */}
 				{timeSlots.map(({ i, isHour, label }) => {
-					const borderClass = isHour ? "sp-border-black" : "sp-border-gray";
-					const row = i + 2;
+					let borderClass = isHour ? "sp-border-black" : "sp-border-gray";
+					let row = i + 2;
 					return [
 						<div
 							key={`time-${i}`}
@@ -144,39 +142,38 @@ function ScheduleGrid({ schedule }: Props) {
 
 				{/* Event cards */}
 				{schedule.events.flatMap((event) => {
-					const evtStart = new Date(event.start);
-					const evtEnd = new Date(event.end);
-					const evtStartMin =
+					let evtStart = new Date(event.start);
+					let evtEnd = new Date(event.end);
+					let evtStartMin =
 						evtStart.getUTCHours() * 60 + evtStart.getUTCMinutes();
-					const evtEndMin = evtEnd.getUTCHours() * 60 + evtEnd.getUTCMinutes();
+					let evtEndMin = evtEnd.getUTCHours() * 60 + evtEnd.getUTCMinutes();
 
 					// Exact slot positions (may be fractional for off-grid times)
-					const startSlotExact = (evtStartMin - startMin) / 30;
-					const endSlotExact = (evtEndMin - startMin) / 30;
+					let startSlotExact = (evtStartMin - startMin) / 30;
+					let endSlotExact = (evtEndMin - startMin) / 30;
 
-					const startSlotFloor = Math.floor(startSlotExact);
-					const endSlotCeil = Math.ceil(endSlotExact);
+					let startSlotFloor = Math.floor(startSlotExact);
+					let endSlotCeil = Math.ceil(endSlotExact);
 
 					// Fraction into the first row where the card actually starts (0–<1)
-					const topFraction = startSlotExact - startSlotFloor;
+					let topFraction = startSlotExact - startSlotFloor;
 
 					// The wrapper spans whole rows; the card is absolutely positioned inside
-					const gridRowStart = startSlotFloor + 2;
-					const gridRowSpan = endSlotCeil - startSlotFloor;
+					let gridRowStart = startSlotFloor + 2;
+					let gridRowSpan = endSlotCeil - startSlotFloor;
 
 					// top% and height% are relative to the wrapper's height (= gridRowSpan rows)
-					const topPct = (topFraction / gridRowSpan) * 100;
-					const heightPct =
-						((endSlotExact - startSlotExact) / gridRowSpan) * 100;
+					let topPct = (topFraction / gridRowSpan) * 100;
+					let heightPct = ((endSlotExact - startSlotExact) / gridRowSpan) * 100;
 
-					const timeLabel = `${formatTime(event.start, schedule["24hr"])} - ${formatTime(event.end, schedule["24hr"])}`;
+					let timeLabel = `${formatTime(event.start, schedule["24hr"])} - ${formatTime(event.end, schedule["24hr"])}`;
 
 					return event.repeats.flatMap((day) => {
-						const colIndex = activeDays.indexOf(day.toLowerCase());
+						let colIndex = activeDays.indexOf(day.toLowerCase());
 						if (colIndex === -1) return [];
-						const borderColor = colIndex % 2 === 0 ? "#eeeeee" : "#ffffff";
-						const strokeW = 6;
-						const textColour = readableTextColour(event.colour);
+						let borderColor = colIndex % 2 === 0 ? "#eeeeee" : "#ffffff";
+						let strokeW = 6;
+						let textColour = readableTextColour(event.colour);
 						return (
 							// Transparent wrapper occupies the exact grid rows
 							<div
@@ -289,12 +286,12 @@ export function SchedulePreview({ schedule }: Props) {
 // ── Hidden print target (always mounted at body level) ────────────────────────
 
 export function SchedulePrintRoot({ schedule }: Props) {
-	const ref = useRef<HTMLDivElement>(null);
+	let ref = useRef<HTMLDivElement>(null);
 
 	// Ensure the print root is always a direct child of <body>
 	// so @media print { body > * } targeting works correctly
 	useEffect(() => {
-		const el = ref.current;
+		let el = ref.current;
 		if (!el) return;
 		document.body.appendChild(el);
 		return () => {

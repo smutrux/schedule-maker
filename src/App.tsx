@@ -140,10 +140,10 @@ function App() {
 		}
 	}, [showPreview]);
 
-	const hasSchedule = schedule !== null;
-	const hasEvents = hasSchedule && schedule.events.length > 0;
+	let hasSchedule = schedule !== null;
+	let hasEvents = hasSchedule && (schedule?.events ?? []).length > 0;
 
-	const colourOptions = (schedule?.colours ?? DEFAULT_COLOURS).map((c) => ({
+	let colourOptions = (schedule?.colours ?? DEFAULT_COLOURS).map((c) => ({
 		value: c.colour,
 		label: c.name,
 	}));
@@ -190,7 +190,7 @@ function App() {
 	}
 
 	function handleSavePrefs() {
-		const errors = validatePreferences(prefsForm);
+		let errors = validatePreferences(prefsForm);
 		if (Object.keys(errors).length) {
 			setPrefsErrors(errors);
 			return;
@@ -199,10 +199,10 @@ function App() {
 			// Starting fresh — wipe any previously saved schedule
 			clearSchedule();
 		}
-		const existing = isEditingExisting
+		let existing = isEditingExisting
 			? (schedule?.colours ?? DEFAULT_COLOURS)
 			: DEFAULT_COLOURS;
-		const built = buildSchedule(
+		let built = buildSchedule(
 			prefsForm,
 			existing,
 			isEditingExisting ? (schedule?.events ?? []) : [],
@@ -226,9 +226,9 @@ function App() {
 
 	/** Converts a saved ScheduleEvent back into the EventForm shape for editing. */
 	function eventToForm(event: Schedule["events"][number]): EventForm {
-		const start = new Date(event.start);
-		const end = new Date(event.end);
-		const pad = (n: number) => String(n).padStart(2, "0");
+		let start = new Date(event.start);
+		let end = new Date(event.end);
+		let pad = (n: number) => String(n).padStart(2, "0");
 		return {
 			name: event.name,
 			additionalInfo: event.additionalInfo ?? "",
@@ -261,27 +261,27 @@ function App() {
 	}
 
 	function handleAddEvent() {
-		const errors = validateEvent(eventForm);
+		let errors = validateEvent(eventForm);
 		if (Object.keys(errors).length) {
 			setEventErrors(errors);
 			return;
 		}
-		const event = buildEvent(eventForm);
+		let event = buildEvent(eventForm);
 		if (!event || !schedule) return;
 
-		const evtStart = event.start.slice(11, 16);
-		const evtEnd = event.end.slice(11, 16);
+		let evtStart = event.start.slice(11, 16);
+		let evtEnd = event.end.slice(11, 16);
 
 		if (editingEventIndex !== null) {
 			// Edit mode — replace the event at the stored index
 			setSchedule((prev) => {
 				if (!prev) return prev;
-				const events = prev.events.map((e, i) =>
+				let events = prev.events.map((e, i) =>
 					i === editingEventIndex ? event : e,
 				);
 				// Recompute bounds across all events after the replacement
-				const allStarts = events.map((e) => e.start.slice(11, 16));
-				const allEnds = events.map((e) => e.end.slice(11, 16));
+				let allStarts = events.map((e) => e.start.slice(11, 16));
+				let allEnds = events.map((e) => e.end.slice(11, 16));
 				return {
 					...prev,
 					scheduleStart: allStarts.reduce(
@@ -297,9 +297,9 @@ function App() {
 			});
 		} else {
 			// Add mode — append and expand bounds if needed
-			const newStart =
+			let newStart =
 				evtStart < schedule.scheduleStart ? evtStart : schedule.scheduleStart;
-			const newEnd =
+			let newEnd =
 				evtEnd > schedule.scheduleEnd ? evtEnd : schedule.scheduleEnd;
 			setSchedule((prev) =>
 				prev
@@ -361,16 +361,16 @@ function App() {
 	}
 
 	function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-		const file = e.target.files?.[0];
+		let file = e.target.files?.[0];
 		if (!file) return;
 		// Reset so the same file can be re-selected after an error
 		e.target.value = "";
 
-		const reader = new FileReader();
+		let reader = new FileReader();
 		reader.onload = (ev) => {
 			try {
-				const parsed = JSON.parse(ev.target?.result as string);
-				const result = validateImport(parsed);
+				let parsed = JSON.parse(ev.target?.result as string);
+				let result = validateImport(parsed);
 				if (result.ok) {
 					setSchedule(result.schedule);
 					setImportError(null);
@@ -451,10 +451,10 @@ function App() {
 				{/* ── Summary / inline preview toggle ───────────────────────── */}
 				{hasSchedule && !showPreview && (
 					<div className="schedule-summary">
-						<strong>{schedule.name}</strong>
+						<strong>{schedule?.name}</strong>
 						{" — "}
-						{schedule.events.length} event
-						{schedule.events.length !== 1 ? "s" : ""}
+						{schedule?.events.length} event
+						{schedule?.events.length !== 1 ? "s" : ""}
 					</div>
 				)}
 
@@ -657,16 +657,16 @@ function App() {
 					{schedule && schedule.events.length > 0 ? (
 						<ul className="remove-event-list">
 							{schedule.events.map((event, i) => {
-								const start = new Date(event.start);
-								const end = new Date(event.end);
-								const fmt = (d: Date) => {
-									const h = d.getUTCHours();
-									const m = String(d.getUTCMinutes()).padStart(2, "0");
+								let start = new Date(event.start);
+								let end = new Date(event.end);
+								let fmt = (d: Date) => {
+									let h = d.getUTCHours();
+									let m = String(d.getUTCMinutes()).padStart(2, "0");
 									if (schedule["24hr"]) return `${h}:${m}`;
-									const h12 = h % 12 || 12;
+									let h12 = h % 12 || 12;
 									return `${h12}:${m} ${h >= 12 ? "PM" : "AM"}`;
 								};
-								const days = event.repeats
+								let days = event.repeats
 									.map((d) => d.charAt(0).toUpperCase() + d.slice(1, 3))
 									.join(", ");
 								return (
@@ -732,15 +732,15 @@ function App() {
 				</Modal>
 
 				{/* Hidden print target mounted to body */}
-				{hasSchedule && <SchedulePrintRoot schedule={schedule} />}
+				{hasSchedule && <SchedulePrintRoot schedule={schedule!} />}
 			</div>
 
 			{hasSchedule && showPreview && (
 				<div className="preview-scaler-outer">
 					<div className="preview-scaler-inner">
 						<SchedulePreview
-							key={`${schedule.scheduleStart}-${schedule.scheduleEnd}-${schedule.events.map((e) => e.start + e.end + e.name + e.colour + e.repeats.join()).join("|")}`}
-							schedule={schedule}
+							key={`${schedule?.scheduleStart}-${schedule?.scheduleEnd}-${schedule?.events.map((e) => e.start + e.end + e.name + e.colour + e.repeats.join()).join("|")}`}
+							schedule={schedule!}
 						/>
 					</div>
 				</div>

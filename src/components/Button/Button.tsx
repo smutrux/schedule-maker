@@ -52,12 +52,12 @@ export function Button({
 	}
 
 	/* ── Default (pill) variant ───────────────────────────────────────────── */
-	const iconEl = icon && (
+	let iconEl = icon && (
 		<span className="btn-icon">
 			<Icon name={icon} />
 		</span>
 	);
-	const textEl = text && <span className="btn-text">{text}</span>;
+	let textEl = text && <span className="btn-text">{text}</span>;
 
 	return (
 		<button

@@ -43,10 +43,10 @@ export function Modal({
 	height,
 	children,
 }: ModalProps) {
-	const dialogRef = useRef<HTMLDialogElement>(null);
+	let dialogRef = useRef<HTMLDialogElement>(null);
 
 	useEffect(() => {
-		const dialog = dialogRef.current;
+		let dialog = dialogRef.current;
 		if (!dialog) return;
 
 		// Prevent the dialog from closing due to external focus loss (e.g. OS colour picker)
@@ -75,7 +75,7 @@ export function Modal({
 		if (e.target === dialogRef.current) onClose();
 	}
 
-	const style: React.CSSProperties = {
+	let style: React.CSSProperties = {
 		...(width !== undefined && {
 			width: typeof width === "number" ? `${width}px` : width,
 		}),
