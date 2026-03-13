@@ -72,6 +72,7 @@
 	font-family: "Poppins", sans-serif;
 	height: 11in;
 	padding: 0.25in;
+	margin:0 auto;
 	/* Match physical letter size + 0.25in margins so screen preview = printed output */
 	width: 8.5in;
 }
