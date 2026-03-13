@@ -1,12 +1,12 @@
 /* ── App root ─────────────────────────────────────────────────────────────── */
 #root {
-	width: 100%;
-	max-width: 1280px;
+	box-sizing: border-box;
 	margin: 0 auto;
+	max-width: 1280px;
+	overflow-x: hidden;
 	padding: 2rem;
 	text-align: center;
-	box-sizing: border-box;
-	overflow-x: hidden;
+	width: 100%;
 }
 
 /* Prevent default margins on the page heading and subtitle */
@@ -22,9 +22,9 @@
  * heading, button toolbar, schedule summary, and modals.
  */
 .content-wrapper {
+	align-items: center;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	gap: 0.75rem;
 }
 
@@ -35,11 +35,11 @@
  */
 .btn-large-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
 	gap: 0.75rem;
-	width: 100%;
-	max-width: 600px;
+	grid-template-columns: repeat(2, 1fr);
 	margin: 0 auto;
+	max-width: 600px;
+	width: 100%;
 }
 
 @media screen and (min-width: 768px) {
@@ -54,11 +54,11 @@
  */
 .modal-large-grid {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
 	gap: 0.75rem;
-	width: 100%;
-	max-width: 300px;
+	grid-template-columns: repeat(2, 1fr);
 	margin: 0 auto;
+	max-width: 300px;
+	width: 100%;
 }
 
 /* ── Modal form layout ────────────────────────────────────────────────────── */
@@ -94,16 +94,16 @@
  * Shows the schedule name and total event count.
  */
 .schedule-summary {
-	margin-top: 1.5rem;
-	margin-inline: auto;
-	padding: 1rem 1.25rem;
-	max-width: 800px;
 	background: var(--color-surface);
 	border: 1.5px solid var(--color-border);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-sm);
 	color: var(--color-text-muted);
 	font-size: 0.95rem;
+	margin-inline: auto;
+	margin-top: 1.5rem;
+	max-width: 800px;
+	padding: 1rem 1.25rem;
 }
 
 /* ── Form validation errors ───────────────────────────────────────────────── */
@@ -138,9 +138,9 @@
 
 /** Centered column layout for the import-error alert dialog body. */
 .modal-alert-body {
+	align-items: center;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
 	gap: 1.25rem;
 	padding: 0.5rem 0;
 }
@@ -159,59 +159,59 @@
 /* ── Remove entry modal list ──────────────────────────────────────────────── */
 
 .remove-event-list {
-	list-style: none;
-	margin: 0;
-	padding: 0;
 	display: flex;
 	flex-direction: column;
 	gap: 0.5rem;
+	list-style: none;
+	margin: 0;
+	padding: 0;
 	width: 100%;
 }
 
 .remove-event-item {
-	display: flex;
 	align-items: center;
-	gap: 0.75rem;
-	padding: 0.6rem 0.75rem;
+	background: var(--color-surface);
 	border: 1.5px solid var(--color-border);
 	border-radius: var(--radius-md);
-	background: var(--color-surface);
+	display: flex;
+	gap: 0.75rem;
+	padding: 0.6rem 0.75rem;
 }
 
 .remove-event-actions {
 	display: flex;
-	gap: 0.4rem;
 	flex-shrink: 0;
+	gap: 0.4rem;
 }
 
 .remove-event-swatch {
-	flex-shrink: 0;
-	width: 1rem;
-	height: 1rem;
-	border-radius: 50%;
 	border: 1.5px solid rgba(0, 0, 0, 0.08);
+	border-radius: 50%;
+	flex-shrink: 0;
+	height: 1rem;
+	width: 1rem;
 }
 
 .remove-event-info {
-	flex: 1;
-	display: flex;
-	flex-direction: column;
 	align-items: flex-start;
+	display: flex;
+	flex: 1;
+	flex-direction: column;
 	gap: 0.15rem;
 	min-width: 0;
 }
 
 .remove-event-name {
-	font-weight: 700;
-	font-size: 0.95rem;
 	color: var(--color-text);
-	white-space: nowrap;
+	font-size: 0.95rem;
+	font-weight: 700;
+	max-width: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
-	max-width: 100%;
+	white-space: nowrap;
 }
 
 .remove-event-meta {
-	font-size: 0.8rem;
 	color: var(--color-text-muted);
+	font-size: 0.8rem;
 }

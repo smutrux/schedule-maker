@@ -12,8 +12,8 @@
 
 /* ── Print setup ──────────────────────────────────────────────────────── */
 @page {
-	size: letter portrait;
 	margin: 0; /* We control margins via .sp-page padding */
+	size: letter portrait;
 }
 
 @media print {
@@ -26,13 +26,13 @@
 	}
 
 	.sp-page {
-		width: 8.5in !important;
-		height: 11in !important;
-		padding: 0.25in !important;
 		box-shadow: none !important;
+		height: 11in !important;
+		left: 0 !important;
+		padding: 0.25in !important;
 		position: fixed !important;
 		top: 0 !important;
-		left: 0 !important;
+		width: 8.5in !important;
 	}
 
 	/* Ensure background colours actually print */
@@ -54,89 +54,86 @@
 /* Hidden container that only surfaces during print */
 .sp-print-root {
 	display: none;
+	left: 0;
 	position: fixed;
 	top: 0;
-	left: 0;
 	z-index: 9999;
 }
 
 /* ── Page wrapper ─────────────────────────────────────────────────────── */
 .sp-page {
-	/* Match physical letter size + 0.25in margins so screen preview = printed output */
-	width: 8.5in;
-	height: 11in;
-	padding: 0.25in;
 	background: white;
+	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 	box-sizing: border-box;
+	color: #000;
 	display: flex;
 	flex-direction: column;
-	font-family: "Poppins", sans-serif;
-	color: #000;
-	box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
 	flex-shrink: 0;
-	margin: 0 auto;
+	font-family: "Poppins", sans-serif;
+	height: 11in;
+	padding: 0.25in;
+	/* Match physical letter size + 0.25in margins so screen preview = printed output */
+	width: 8.5in;
 }
 
 /* ── Title ────────────────────────────────────────────────────────────── */
 .sp-title {
-	text-align: center;
-	margin: 0 0 16px 0;
+	color: #333;
 	font-size: 11px;
 	font-weight: 700;
-	text-transform: uppercase;
 	letter-spacing: 0.08em;
-	color: #333;
+	margin: 0 0 16px 0;
+	text-align: center;
+	text-transform: uppercase;
 }
 
 /* ── Grid ─────────────────────────────────────────────────────────────── */
 .sp-grid {
 	display: grid;
 	flex: 1 1 0; /* grow AND start from 0 so height is explicit */
-	min-height: 0; /* allow shrink below content size */
 	font-size: 11px;
-	position: relative;
+	min-height: 0; /* allow shrink below content size */
 	overflow: hidden;
+	position: relative;
 }
 
 /* ── Header cells ─────────────────────────────────────────────────────── */
 .sp-header-cell {
-	text-align: center;
-	font-weight: 700;
-	font-size: 11px;
-	padding: 4px;
-	border-right: 1px solid #bebebe;
-	background: #fff;
-	display: flex;
 	align-items: center;
+	background: #fff;
+	border-right: 1px solid #bebebe;
+	display: flex;
+	font-size: 11px;
+	font-weight: 700;
 	justify-content: center;
+	padding: 4px;
 	position: sticky;
+	text-align: center;
 	top: 0;
 	z-index: 2;
 }
 
 /* ── Time column ──────────────────────────────────────────────────────── */
 .sp-time-cell {
-	position: relative;
-	border-right: 1px solid #bebebe;
 	background: #fff;
+	border-right: 1px solid #bebebe;
+	position: relative;
 }
 
 .sp-time-text {
-	position: absolute;
-	top: -7px;
-	right: 4px;
 	background: white;
-	padding: 0 3px;
 	color: #555;
 	font-size: 0.8em;
+	padding: 0 3px;
+	position: absolute;
+	right: 4px;
+	top: -7px;
 	white-space: nowrap;
 	z-index: 2;
 }
 
 /* ── Background cells ─────────────────────────────────────────────────── */
 .sp-grid-cell {
-	width: 100%;
-	height: 100%;
 	border-right: 1px solid #bebebe;
 	box-sizing: border-box;
 }
@@ -169,26 +166,26 @@
 
 /* ── Event cards ──────────────────────────────────────────────────────── */
 .sp-event-card {
-	position: absolute; /* positioned within wrapper using top% + height% */
-	left: 0;
-	right: 1px;
-	padding: 12px;
+	align-items: flex-start;
 	border-radius: 12px;
-	font-size: 0.75rem;
+	box-sizing: border-box;
 	display: flex;
 	flex-direction: column;
-	align-items: flex-start;
+	font-size: 0.75rem;
 	gap: 1px;
-	box-sizing: border-box;
+	left: 0;
 	margin-top: 1px;
+	padding: 12px;
+	position: absolute; /* positioned within wrapper using top% + height% */
+	right: 1px;
 }
 
 .sp-event-border {
-	position: absolute;
-	inset: -1px;
-	width: calc(100% + 2px);
 	height: calc(100% + 2px);
+	inset: -1px;
 	pointer-events: none;
+	position: absolute;
+	width: calc(100% + 2px);
 }
 
 .sp-event-name {
@@ -199,25 +196,25 @@
 	font-size: 0.7rem;
 }
 .sp-event-info {
-	font-size: 0.7rem;
 	color: inherit;
+	font-size: 0.7rem;
 	opacity: 0.75;
 	text-align: left;
 }
 .sp-event-online {
+	color: inherit;
 	font-size: 0.65rem;
 	font-style: italic;
-	color: inherit;
 	opacity: 0.75;
 }
 
 /* ── Capture mode: temporarily reveals print root for image export ────── */
 .sp-print-root.sp-capturing {
 	display: block !important;
+	left: 0 !important;
+	pointer-events: none !important;
 	position: fixed !important;
 	top: 0 !important;
-	left: 0 !important;
-	z-index: -9999 !important;
 	visibility: visible !important;
-	pointer-events: none !important;
+	z-index: -9999 !important;
 }

@@ -15,20 +15,20 @@
 /* ── Default (pill) variant ───────────────────────────────────────────────── */
 
 .btn {
-	display: inline-flex;
 	align-items: center;
-	gap: 0.5rem;
-	height: 3rem;
-	padding: 0 0.75rem;
 	background: var(--color-primary);
 	border: none;
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
 	color: var(--color-surface);
 	cursor: pointer;
+	display: inline-flex;
 	font-family: "Poppins", system-ui, Helvetica, sans-serif;
 	font-size: 1.2rem;
 	font-weight: 700;
+	gap: 0.5rem;
+	height: 3rem;
+	padding: 0 0.75rem;
 	transform: translateY(0);
 	transition:
 		transform 90ms ease-out,
@@ -54,8 +54,8 @@
 
 /* Icon wrapper */
 .btn-icon {
-	display: inline-flex;
 	align-items: center;
+	display: inline-flex;
 	justify-content: center;
 }
 
@@ -66,30 +66,29 @@
 
 /* Icon-only mode: collapse to a square when there is no label */
 .btn:has(.btn-icon):not(:has(.btn-text)) {
-	width: 3rem;
-	padding: 0;
 	justify-content: center;
+	padding: 0;
+	width: 3rem;
 }
 
 /* ── Large (card) variant ─────────────────────────────────────────────────── */
 
 .btn-large {
-	display: inline-flex;
-	flex-direction: column;
 	align-items: center;
-	width: auto;
-	min-width: 0;
-	height: auto;
-	padding: 0;
-	gap: 0;
 	background: var(--color-surface);
 	border: 1.5px solid var(--color-border);
 	border-radius: var(--radius-md);
 	box-shadow: var(--shadow-md);
 	color: var(--color-text);
 	cursor: pointer;
+	display: inline-flex;
+	flex-direction: column;
 	font-size: 1rem;
 	font-weight: 700;
+	gap: 0;
+	height: auto;
+	min-width: 0;
+	padding: 0;
 	transition:
 		box-shadow 90ms ease-out,
 		border-color var(--transition-fast),
@@ -99,8 +98,8 @@
 
 .btn-large:hover {
 	background: var(--color-surface-muted);
-	border-color: var(--color-border-hover);
 	background-image: none;
+	border-color: var(--color-border-hover);
 	filter: none;
 }
 
@@ -112,37 +111,37 @@
 
 /* Icon area — square with aspect-ratio padding */
 .btn-large-icon {
-	display: flex;
 	align-items: center;
-	justify-content: center;
-	width: 100%;
 	aspect-ratio: 1;
-	padding: 1rem;
 	box-sizing: border-box;
+	display: flex;
+	justify-content: center;
+	padding: 1rem;
+	width: 100%;
 }
 
 /* Responsive icon size: clamps from 1.5rem to 3rem across viewport widths */
 .btn-large-icon .material-symbols-rounded {
-	font-size: clamp(1.5rem, 8vw, 3rem);
-	width: 100%;
-	height: 100%;
-	display: flex;
 	align-items: center;
+	display: flex;
+	font-size: clamp(1.5rem, 8vw, 3rem);
+	height: 100%;
 	justify-content: center;
+	width: 100%;
 }
 
 /* Label area */
 .btn-large-text {
-	padding: 0.5rem 0.75rem 0.75rem;
 	box-sizing: border-box;
-	text-align: center;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-	font-size: 1rem;
 	color: var(--color-text);
-	width: 100%;
+	font-size: 1rem;
+	overflow: hidden;
+	padding: 0.5rem 0.75rem 0.75rem;
+	text-align: center;
+	text-overflow: ellipsis;
 	transition: color var(--transition-fast);
+	white-space: nowrap;
+	width: 100%;
 }
 
 /* ── Active / toggled state (large variant only) ─────────────────────────── */
@@ -150,9 +149,9 @@
 .btn-large.btn-large-active,
 .btn-large.btn-large-active:hover {
 	background: var(--color-text);
+	background-image: none;
 	border-color: var(--color-text);
 	color: var(--color-surface);
-	background-image: none;
 	filter: none;
 }
 
@@ -173,12 +172,12 @@
 .btn-disabled:hover,
 .btn-disabled:active {
 	background: transparent;
+	border: 1.5px solid var(--color-border);
 	box-shadow: none;
 	color: var(--color-text-disabled);
 	cursor: not-allowed;
 	filter: none;
 	transform: none;
-	border: 1.5px solid var(--color-border);
 }
 
 /* Large-disabled overrides the default disabled border/background */

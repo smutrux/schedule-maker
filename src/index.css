@@ -5,73 +5,62 @@
 
 :root {
 	/* ── Colour palette ───────────────────────────────────────────────────── */
-
 	/* Backgrounds */
-	--color-bg:             #dcedff;
-	--color-surface:        #ffffff;
-	--color-surface-muted:  #f4f8ff;
-
-	/* Text */
-	--color-text:           #1e292d;
-	--color-text-muted:     #5f7480;
-	--color-text-disabled:  #9bafbf;
-
-	/* Brand / interactive */
-	--color-primary:        #4a7cff;
-	--color-primary-hover:  #3b6be6;
-	--color-primary-active: #2f5acc;
-	--color-secondary:      #8fb3e8;
-	--color-secondary-hover:#7aa3e0;
-
+	--color-bg: #dcedff;
 	/* Borders */
-	--color-border:         #c7d9f0;
-	--color-border-hover:   #8fb3e8;
-	--color-border-focus:   #4a7cff;
-
+	--color-border: #c7d9f0;
+	--color-border-focus: #4a7cff;
+	--color-border-hover: #8fb3e8;
+	--color-error: #e06b6b;
+	--color-error-bg: #fff5f5;
 	/* Feedback */
-	--color-focus-ring:     rgba(74, 124, 255, 0.25);
-	--color-error:          #e06b6b;
-	--color-error-bg:       #fff5f5;
-
-	/* ── Shadows ──────────────────────────────────────────────────────────── */
-	--shadow-sm: 0 2px 6px  rgba(30, 41, 45, 0.12);
-	--shadow-md: 0 4px 12px rgba(30, 41, 45, 0.12);
-	--shadow-lg: 0 10px 30px rgba(30, 41, 45, 0.18);
-
+	--color-focus-ring: rgba(74, 124, 255, 0.25);
+	/* Brand / interactive */
+	--color-primary: #4a7cff;
+	--color-primary-active: #2f5acc;
+	--color-primary-hover: #3b6be6;
+	--color-secondary: #8fb3e8;
+	--color-secondary-hover: #7aa3e0;
+	--color-surface: #ffffff;
+	--color-surface-muted: #f4f8ff;
+	/* Text */
+	--color-text: #1e292d;
+	--color-text-disabled: #9bafbf;
+	--color-text-muted: #5f7480;
+	--radius-lg: 16px;
+	--radius-md: 8px;
 	/* ── Border radii ─────────────────────────────────────────────────────── */
 	--radius-sm: 4px;
-	--radius-md: 8px;
-	--radius-lg: 16px;
-
+	--shadow-lg: 0 10px 30px rgba(30, 41, 45, 0.18);
+	--shadow-md: 0 4px 12px rgba(30, 41, 45, 0.12);
+	/* ── Shadows ──────────────────────────────────────────────────────────── */
+	--shadow-sm: 0 2px 6px rgba(30, 41, 45, 0.12);
+	--transition-base: 180ms ease;
 	/* ── Transitions ──────────────────────────────────────────────────────── */
 	--transition-fast: 120ms ease;
-	--transition-base: 180ms ease;
-
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	background-color: var(--color-bg);
+	color: var(--color-text);
+	color-scheme: light dark;
 	/* ── Typography ───────────────────────────────────────────────────────── */
 	font-family: "Poppins", system-ui, Helvetica, sans-serif;
 	font-size: 90%;
-	font-weight: 400;
-	line-height: 1.5;
-
-	color: var(--color-text);
-	color-scheme: light dark;
-	background-color: var(--color-bg);
-
 	/* Rendering */
 	font-synthesis: none;
+	font-weight: 400;
+	line-height: 1.5;
 	text-rendering: optimizeLegibility;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
 }
 
 /* ── Base element resets ──────────────────────────────────────────────────── */
 
 body {
-	margin: 0;
 	display: flex;
-	place-items: center;
-	min-width: 320px;
+	margin: 0;
 	min-height: 100vh;
+	min-width: 320px;
+	place-items: center;
 }
 
 h1 {
@@ -91,13 +80,19 @@ a:hover {
 /* ── Responsive font scaling ──────────────────────────────────────────────── */
 
 @media screen and (min-width: 768px) {
-	body { font-size: 100%; }
+	body {
+		font-size: 100%;
+	}
 }
 
 @media screen and (min-width: 1024px) {
-	body { font-size: 110%; }
+	body {
+		font-size: 110%;
+	}
 }
 
 @media screen and (min-width: 2560px) {
-	body { font-size: 120%; }
+	body {
+		font-size: 120%;
+	}
 }
