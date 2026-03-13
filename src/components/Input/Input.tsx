@@ -273,9 +273,17 @@ export function Dropdown({
 		onChange?.(e.target.value);
 	}
 
+	const isHex = /^#[0-9a-fA-F]{6}$/.test(value);
+
 	return (
 		<Field label={label} id={id}>
 			<div className="input-wrapper input-select-wrapper">
+				{isHex && (
+					<span
+						className="input-select-swatch"
+						style={{ backgroundColor: value }}
+					/>
+				)}
 				<select
 					id={id}
 					className={`input-select ${!value ? "placeholder" : ""}`}

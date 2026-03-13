@@ -170,6 +170,16 @@
 	cursor: pointer;
 }
 
+.input-select-swatch {
+	flex-shrink: 0;
+	width: 1.1rem;
+	height: 1.1rem;
+	border-radius: var(--radius-sm);
+	border: 1.5px solid rgba(0, 0, 0, 0.12);
+	margin-left: 0.75rem;
+	pointer-events: none;
+}
+
 .input-select {
 	appearance: none;
 	-webkit-appearance: none;
@@ -184,6 +194,11 @@
 	font-family: inherit;
 	color: var(--color-text);
 	cursor: pointer;
+}
+
+/* When a colour swatch precedes the select, reduce its left padding */
+.input-select-swatch + .input-select {
+	padding-left: 0.5rem;
 }
 
 .input-select.placeholder {
